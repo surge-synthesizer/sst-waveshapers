@@ -1,6 +1,6 @@
 #include "TestUtils.h"
 
-TEST_CASE("Saturator Tests")
+TEST_CASE("Saturators Test")
 {
     SECTION("SOFT")
     {

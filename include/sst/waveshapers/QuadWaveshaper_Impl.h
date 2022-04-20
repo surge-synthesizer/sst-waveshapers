@@ -3,7 +3,9 @@
 
 #include "QuadWaveshaper.h"
 #include "WaveshaperConfiguration.h"
+
 #include "Saturators.h"
+#include "Effects.h"
 
 namespace sst::waveshapers
 {
@@ -22,6 +24,12 @@ inline QuadWaveshaperPtr GetQuadWaveshaper(WaveshaperType type)
         return ASYM_SSE2; // replace with WT_LUT call
     case WaveshaperType::wst_ojd:
         return OJD;
+
+    // effects
+    case WaveshaperType::wst_sine:
+        return SINUS_SSE2;
+    case WaveshaperType::wst_digital:
+        return DIGI_SSE2;
 
     // unknown...
     default:

@@ -4,6 +4,7 @@ target_link_libraries(sst-waveshapers-tests PRIVATE ${PROJECT_NAME} simde)
 target_sources(sst-waveshapers-tests
     PRIVATE
         SaturatorsTest.cpp
+        EffectsTest.cpp
         tests.cpp
 )
 
