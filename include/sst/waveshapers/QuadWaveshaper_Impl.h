@@ -9,6 +9,7 @@
 #include "Harmonics.h"
 #include "Rectifiers.h"
 #include "Wavefolders.h"
+#include "Fuzzes.h"
 
 namespace sst::waveshapers
 {
@@ -77,6 +78,18 @@ inline QuadWaveshaperPtr GetQuadWaveshaper(WaveshaperType type)
         return WAVEFOLDER<dualFoldADAA>;
     case WaveshaperType::wst_westfold:
         return WAVEFOLDER<westCoastFoldADAA>;
+
+    // fuzzes
+    case WaveshaperType::wst_fuzz:
+        return TableEval<FuzzTable<1>, 1024, CLIP>;
+    case WaveshaperType::wst_fuzzheavy:
+        return TableEval<FuzzTable<3>, 1024, CLIP>;
+    case WaveshaperType::wst_fuzzctr:
+        return TableEval<FuzzCtrTable, 2048, TANH>;
+    case WaveshaperType::wst_fuzzsoft:
+        return TableEval<FuzzTable<1>, 1024, TANH>;
+    case WaveshaperType::wst_fuzzsoftedge:
+        return TableEval<FuzzEdgeTable, 2048, TANH>;
 
     // unknown...
     default:
