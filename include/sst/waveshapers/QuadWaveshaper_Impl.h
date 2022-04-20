@@ -8,6 +8,7 @@
 #include "Effects.h"
 #include "Harmonics.h"
 #include "Rectifiers.h"
+#include "Wavefolders.h"
 
 namespace sst::waveshapers
 {
@@ -66,6 +67,16 @@ inline QuadWaveshaperPtr GetQuadWaveshaper(WaveshaperType type)
         return ADAA_POS_WAVE<0, 1>;
     case WaveshaperType::wst_negwav:
         return ADAA_NEG_WAVE<0, 1>;
+
+    // wavefolder
+    case WaveshaperType::wst_softfold:
+        return SoftOneFold;
+    case WaveshaperType::wst_singlefold:
+        return WAVEFOLDER<singleFoldADAA>;
+    case WaveshaperType::wst_dualfold:
+        return WAVEFOLDER<dualFoldADAA>;
+    case WaveshaperType::wst_westfold:
+        return WAVEFOLDER<westCoastFoldADAA>;
 
     // unknown...
     default:
