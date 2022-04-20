@@ -6,6 +6,7 @@
 
 #include "Saturators.h"
 #include "Effects.h"
+#include "Harmonics.h"
 
 namespace sst::waveshapers
 {
@@ -21,7 +22,7 @@ inline QuadWaveshaperPtr GetQuadWaveshaper(WaveshaperType type)
     case WaveshaperType::wst_hard:
         return CLIP;
     case WaveshaperType::wst_asym:
-        return ASYM_SSE2; // replace with WT_LUT call
+        return ASYM_SSE2;
     case WaveshaperType::wst_ojd:
         return OJD;
 
@@ -30,6 +31,30 @@ inline QuadWaveshaperPtr GetQuadWaveshaper(WaveshaperType type)
         return SINUS_SSE2;
     case WaveshaperType::wst_digital:
         return DIGI_SSE2;
+
+    // harmonic
+    case WaveshaperType::wst_cheby2: // soft harmonic 2
+        return CHEBY_CORE<cheb2_kernel, true>;
+    case WaveshaperType::wst_cheby3: // soft harmonic 3
+        return CHEBY_CORE<cheb3_kernel, true>;
+    case WaveshaperType::wst_cheby4: // soft harmonic 4
+        return CHEBY_CORE<cheb4_kernel, true>;
+    case WaveshaperType::wst_cheby5: // soft harmonic 5
+        return CHEBY_CORE<cheb5_kernel, true>;
+    case WaveshaperType::wst_add12:
+        return Plus12;
+    case WaveshaperType::wst_add13:
+        return Plus13;
+    case WaveshaperType::wst_add14:
+        return Plus14;
+    case WaveshaperType::wst_add15:
+        return Plus15;
+    case WaveshaperType::wst_add12345:
+        return Plus12345;
+    case WaveshaperType::wst_addsaw3:
+        return PlusSaw3;
+    case WaveshaperType::wst_addsqr3:
+        return PlusSqr3;
 
     // unknown...
     default:

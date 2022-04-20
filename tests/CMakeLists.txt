@@ -5,6 +5,7 @@ target_sources(sst-waveshapers-tests
     PRIVATE
         SaturatorsTest.cpp
         EffectsTest.cpp
+        HarmonicsTest.cpp
         tests.cpp
 )
 
