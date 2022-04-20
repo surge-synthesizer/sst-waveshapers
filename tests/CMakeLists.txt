@@ -9,6 +9,7 @@ target_sources(sst-waveshapers-tests
         RectifiersTest.cpp
         WavefoldersTest.cpp
         FuzzesTest.cpp
+        TrigonometricsTest.cpp
         tests.cpp
 )
 
