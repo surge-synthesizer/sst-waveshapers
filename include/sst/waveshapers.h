@@ -18,8 +18,11 @@ namespace utilities
 {
 }
 
-} // namespace filters
-
+} // namespace waveshapers
 } // namespace sst
+
+#include "waveshapers/QuadWaveshaper.h"
+
+#include "waveshapers/QuadWaveshaper_Impl.h"
 
 #endif // _SST_CPP_WAVESHAPERS_H

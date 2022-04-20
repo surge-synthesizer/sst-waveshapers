@@ -3,7 +3,7 @@ target_include_directories(sst-waveshapers-tests PRIVATE .)
 target_link_libraries(sst-waveshapers-tests PRIVATE ${PROJECT_NAME} simde)
 target_sources(sst-waveshapers-tests
     PRIVATE
-        WaveshapersTest.cpp
+        SaturatorsTest.cpp
         tests.cpp
 )
 

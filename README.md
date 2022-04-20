@@ -1,6 +1,6 @@
 # SST Waveshapers
 
-Tests: [![CI Build Status](https://dev.azure.com/surge-synthesizer/surge/_apis/build/status/surge-synthesizer.sst-filters?branchName=main)](https://dev.azure.com/surge-synthesizer/surge/_apis/build/status/surge-synthesizer.sst-waveshapers?branchName=main)
+Tests: [![CI Build Status](https://dev.azure.com/surge-synthesizer/surge/_apis/build/status/surge-synthesizer.sst-waveshapers?branchName=main)](https://dev.azure.com/surge-synthesizer/surge/_apis/build/status/surge-synthesizer.sst-waveshapers?branchName=main)
 
 This repository contains the waveshapers from the
 [Surge Synthesizer](https://github.com/surge-synthesizer/surge)
@@ -27,7 +27,7 @@ intrinsics, it is recommended to also link with
 
 ## Building Unit Tests
 
-To build and run the sst-filters unit tests:
+To build and run the sst-waveshapers unit tests:
 ```bash
 cmake -Bbuild
 cmake --build build
