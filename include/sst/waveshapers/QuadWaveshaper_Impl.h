@@ -7,6 +7,7 @@
 #include "Saturators.h"
 #include "Effects.h"
 #include "Harmonics.h"
+#include "Rectifiers.h"
 
 namespace sst::waveshapers
 {
@@ -55,6 +56,16 @@ inline QuadWaveshaperPtr GetQuadWaveshaper(WaveshaperType type)
         return PlusSaw3;
     case WaveshaperType::wst_addsqr3:
         return PlusSqr3;
+
+    // rectifier
+    case WaveshaperType::wst_fwrectify:
+        return ADAA_FULL_WAVE;
+    case WaveshaperType::wst_softrect:
+        return ADAA_SOFTRECT_WAVE;
+    case WaveshaperType::wst_poswav:
+        return ADAA_POS_WAVE<0, 1>;
+    case WaveshaperType::wst_negwav:
+        return ADAA_NEG_WAVE<0, 1>;
 
     // unknown...
     default:
