@@ -64,6 +64,52 @@ enum class WaveshaperType
 
     n_ws_types,
 };
-}
+
+const char wst_names[(int)WaveshaperType::n_ws_types][32] = {"Off",
+                                                             "Soft",
+                                                             "Hard",
+                                                             "Asymmetric",
+                                                             "Sine",
+                                                             "Digital",
+                                                             "Soft Harmonic 2",
+                                                             "Soft Harmonic 3",
+                                                             "Soft Harmonic 4",
+                                                             "Soft Harmonic 5",
+                                                             "Full Wave",
+                                                             "Half Wave Positive",
+                                                             "Half Wave Negative",
+                                                             "Soft Rectifier",
+                                                             "Single Fold",
+                                                             "Double Fold",
+                                                             "West Coast Fold",
+                                                             "Additive 1+2",
+                                                             "Additive 1+3",
+                                                             "Additive 1+4",
+                                                             "Additive 1+5",
+                                                             "Additive 12345",
+                                                             "Additive Saw 3",
+                                                             "Additive Square 3",
+
+                                                             "Fuzz",
+                                                             "Fuzz Soft Clip",
+                                                             "Heavy Fuzz",
+                                                             "Fuzz Center",
+                                                             "Fuzz Soft Edge",
+
+                                                             "Sin+x",
+                                                             "Sin 2x + x",
+                                                             "Sin 3x + x",
+                                                             "Sin 7x + x",
+                                                             "Sin 10x + x",
+                                                             "2 Cycle",
+                                                             "7 Cycle",
+                                                             "10 Cycle",
+                                                             "2 Cycle Bound",
+                                                             "7 Cycle Bound",
+                                                             "10 Cycle Bound",
+                                                             "Medium",
+                                                             "OJD",
+                                                             "Soft Single Fold"};
+} // namespace sst::waveshapers
 
 #endif // SST_WAVESHAPERS_WAVESHAPERCONFIGURATION_H

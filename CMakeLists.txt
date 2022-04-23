@@ -22,6 +22,7 @@ else ()
     set(is_toplevel 0)
 endif ()
 option(SST_WAVESHAPERS_BUILD_TESTS "Add targets for building and running sst-waveshapers tests" ${is_toplevel})
+option(SST_WAVESHAPERS_BUILD_EXAMPLES "Add targets for building and running sst-waveshapers examples" OFF)
 
 if (SST_WAVESHAPERS_BUILD_TESTS)
     message(STATUS "Importing SIMDE with CPM")
@@ -35,4 +36,8 @@ endif ()
 
 if (SST_WAVESHAPERS_BUILD_TESTS)
     add_subdirectory(tests)
+endif ()
+
+if (SST_WAVESHAPERS_BUILD_EXAMPLES)
+    add_subdirectory(examples)
 endif ()
