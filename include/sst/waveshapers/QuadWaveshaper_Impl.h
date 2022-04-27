@@ -119,8 +119,10 @@ inline QuadWaveshaperPtr GetQuadWaveshaper(WaveshaperType type)
     // no waveshaper type
     case WaveshaperType::wst_none:
     case WaveshaperType::n_ws_types:
-        return nullptr;
+        break;
     }
+
+    return nullptr;
 }
 
 inline void initializeWaveshaperRegister(WaveshaperType type, float R[n_waveshaper_registers])
