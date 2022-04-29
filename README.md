@@ -6,7 +6,15 @@ This repository contains the waveshapers from the
 [Surge Synthesizer](https://github.com/surge-synthesizer/surge)
 as a submodule.
 
-Currently a work-in-progress. Check back later!
+Current waveshapers include:
+- Saturators
+- Rectifiers
+- Wavefolders
+- Additive
+- Fuzzes
+- Trigonometric
+
+For more information, see the [API documentation](https://surge-synthesizer.github.io/sst-docs/docs/sst-waveshapers/index.html).
 
 ## Usage
 
@@ -33,6 +41,16 @@ cmake -Bbuild
 cmake --build build
 ./build/test-binary/sst-waveshapers-tests
 ```
+
+## Building Examples
+
+To build the sst-waveshapers examples:
+```bash
+cmake -Bbuild -DSST_WAVESHAPERS_BUILD_EXAMPLES=ON
+cmake --build build
+```
+
+Example binaries will be located in `build/example-binaries/`.
 
 ## License
 The code in this repository is licensed under the General Public License v3.
