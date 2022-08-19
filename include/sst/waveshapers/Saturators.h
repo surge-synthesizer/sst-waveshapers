@@ -38,8 +38,8 @@ inline __m128 ZAMSAT(QuadWaveshaperState *__restrict s, __m128 x, __m128 drive)
     x = CLIP(s, x, drive);
 
     // 2x * ( 1 - |x| )
-    static const auto p1 = _mm_set1_ps(1.f);
-    static const auto p2 = _mm_set1_ps(2.f);
+    const auto p1 = _mm_set1_ps(1.f);
+    const auto p2 = _mm_set1_ps(2.f);
 
     auto gz = _mm_cmpge_ps(x, _mm_setzero_ps());
     auto sgn = _mm_sub_ps(_mm_and_ps(gz, p1), _mm_andnot_ps(gz, p1));
@@ -60,13 +60,13 @@ inline __m128 OJD(QuadWaveshaperState *__restrict s, __m128 x, __m128 drive)
 {
     x = _mm_mul_ps(x, drive);
 
-    static const auto pm17 = _mm_set1_ps(-1.7f);
-    static const auto p11 = _mm_set1_ps(1.1f);
-    static const auto pm03 = _mm_set1_ps(-0.3f);
-    static const auto p09 = _mm_set1_ps(0.9f);
+    const auto pm17 = _mm_set1_ps(-1.7f);
+    const auto p11 = _mm_set1_ps(1.1f);
+    const auto pm03 = _mm_set1_ps(-0.3f);
+    const auto p09 = _mm_set1_ps(0.9f);
 
-    static const auto denLow = _mm_set1_ps(1.f / (4 * (1 - 0.3f)));
-    static const auto denHigh = _mm_set1_ps(1.f / (4 * (1 - 0.9f)));
+    const auto denLow = _mm_set1_ps(1.f / (4 * (1 - 0.3f)));
+    const auto denHigh = _mm_set1_ps(1.f / (4 * (1 - 0.9f)));
 
     auto maskNeg = _mm_cmple_ps(x, pm17);                         // in <= -1.7f
     auto maskPos = _mm_cmpge_ps(x, p11);                          // in > 1.1f
@@ -74,8 +74,8 @@ inline __m128 OJD(QuadWaveshaperState *__restrict s, __m128 x, __m128 drive)
     auto maskHigh = _mm_andnot_ps(maskPos, _mm_cmpgt_ps(x, p09)); // in > 0.9 && in < 1.1
     auto maskMid = _mm_and_ps(_mm_cmpge_ps(x, pm03), _mm_cmple_ps(x, p09)); // the middle
 
-    static const auto vNeg = _mm_set1_ps(-1.0);
-    static const auto vPos = _mm_set1_ps(1.0);
+    const auto vNeg = _mm_set1_ps(-1.0);
+    const auto vPos = _mm_set1_ps(1.0);
     auto vMid = x;
 
     auto xlow = _mm_sub_ps(x, pm03);
