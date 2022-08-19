@@ -16,7 +16,7 @@ inline void posrect_kernel(__m128 x, __m128 &f, __m128 &adF)
      *
      * observe that adF = F^2/2 in all cases
      */
-    static const auto p5 = _mm_set1_ps(0.5f);
+    const auto p5 = _mm_set1_ps(0.5f);
     auto gz = _mm_cmpge_ps(x, _mm_setzero_ps());
     f = _mm_and_ps(gz, x);
     adF = _mm_mul_ps(p5, _mm_mul_ps(f, f));
@@ -37,7 +37,7 @@ inline void negrect_kernel(__m128 x, __m128 &f, __m128 &adF)
      *
      * observe that adF = F^2/2 in all cases
      */
-    static const auto p5 = _mm_set1_ps(0.5f);
+    const auto p5 = _mm_set1_ps(0.5f);
     auto gz = _mm_cmple_ps(x, _mm_setzero_ps());
     f = _mm_and_ps(gz, x);
     adF = _mm_mul_ps(p5, _mm_mul_ps(f, f));
@@ -56,8 +56,8 @@ inline void fwrect_kernel(__m128 x, __m128 &F, __m128 &adF)
      * F   : x > 0 ? x : -x  = sgn(x) * x
      * adF : x > 0 ? x^2 / 2 : -x^2 / 2 = sgn(x) * x^2 / 2
      */
-    static const auto p1 = _mm_set1_ps(1.f);
-    static const auto p05 = _mm_set1_ps(0.5f);
+    const auto p1 = _mm_set1_ps(1.f);
+    const auto p05 = _mm_set1_ps(0.5f);
     auto gz = _mm_cmpge_ps(x, _mm_setzero_ps());
     auto sgn = _mm_sub_ps(_mm_and_ps(gz, p1), _mm_andnot_ps(gz, p1));
 
@@ -77,8 +77,8 @@ inline void softrect_kernel(__m128 x, __m128 &F, __m128 &adF)
      * F   : x > 0 ? 2x-1 : -2x - 1   = 2 * ( sgn(x) * x ) - 1
      * adF : x > 0 ? x^2-x : -x^2 - x = sgn(x) * x^2 - x
      */
-    static const auto p2 = _mm_set1_ps(2.f);
-    static const auto p1 = _mm_set1_ps(1.f);
+    const auto p2 = _mm_set1_ps(2.f);
+    const auto p1 = _mm_set1_ps(1.f);
     auto gz = _mm_cmpge_ps(x, _mm_setzero_ps());
     auto sgn = _mm_sub_ps(_mm_and_ps(gz, p1), _mm_andnot_ps(gz, p1));
 

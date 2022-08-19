@@ -11,7 +11,7 @@ namespace sst::waveshapers
 template <int scale> float FuzzTable(const float x)
 {
     static auto gen = std::minstd_rand(2112);
-    static const float range = 0.1 * scale;
+    const float range = 0.1 * scale;
     static auto dist = std::uniform_real_distribution<float>(-range, range);
 
     auto xadj = x * (1 - range) + dist(gen);
@@ -28,7 +28,7 @@ __m128 Fuzz(QuadWaveshaperState *__restrict s, __m128 x, __m128 drive)
 inline float FuzzCtrTable(const float x)
 {
     static auto gen = std::minstd_rand(2112);
-    static const float b = 20;
+    const float b = 20;
 
     static auto dist = std::uniform_real_distribution<float>(-1.0, 1.0);
 

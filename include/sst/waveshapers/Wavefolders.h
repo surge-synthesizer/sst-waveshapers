@@ -45,7 +45,7 @@ template <int pts> struct FolderADAA
 
     inline void evaluate(__m128 x, __m128 &f, __m128 &adf)
     {
-        static const auto p05 = _mm_set1_ps(0.5f);
+        const auto p05 = _mm_set1_ps(0.5f);
         __m128 rangeMask[pts - 1], val[pts - 1], adVal[pts - 1];
 
         for (int i = 0; i < pts - 1; ++i)
@@ -118,8 +118,8 @@ inline __m128 SoftOneFold(QuadWaveshaperState *__restrict, __m128 x, __m128 driv
     auto y = _mm_mul_ps(x, drive);
     auto y2 = _mm_mul_ps(y, y);
 
-    static const auto p04 = _mm_set1_ps(0.4f);
-    static const auto p07 = _mm_set1_ps(0.7f);
+    const auto p04 = _mm_set1_ps(0.4f);
+    const auto p07 = _mm_set1_ps(0.7f);
 
     auto num = _mm_add_ps(p04, _mm_mul_ps(p07, y2));
 

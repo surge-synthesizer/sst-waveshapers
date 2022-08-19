@@ -56,12 +56,12 @@ __m128 WS_LUT(QuadWaveshaperState *__restrict, const float *table, __m128 in, __
 // Given a table of size N+1, N a power of 2, representing data between -1 and 1, interp
 template <int N> __m128 WS_PM1_LUT(const float *table, __m128 in)
 {
-    static const __m128 one = _mm_set1_ps(1.f);
-    static const __m128 dx = _mm_set1_ps(N / 2.f);
-    static const __m128 oodx = _mm_set1_ps(2.f / N);
-    static const __m128 ctr = _mm_set1_ps(N / 2.f);
-    static const __m128 UB = _mm_set1_ps(N - 1.f);
-    static const __m128 zero = _mm_setzero_ps();
+    const auto one = _mm_set1_ps(1.f);
+    const auto dx = _mm_set1_ps(N / 2.f);
+    const auto oodx = _mm_set1_ps(2.f / N);
+    const auto ctr = _mm_set1_ps(N / 2.f);
+    const auto UB = _mm_set1_ps(N - 1.f);
+    const auto zero = _mm_setzero_ps();
 
     auto x = _mm_add_ps(_mm_mul_ps(in, dx), ctr);
     auto e = _mm_cvtps_epi32(_mm_max_ps(_mm_min_ps(x, UB), zero));
