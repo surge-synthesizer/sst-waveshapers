@@ -58,7 +58,6 @@ template <int N> __m128 WS_PM1_LUT(const float *table, __m128 in)
 {
     const auto one = _mm_set1_ps(1.f);
     const auto dx = _mm_set1_ps(N / 2.f);
-    const auto oodx = _mm_set1_ps(2.f / N);
     const auto ctr = _mm_set1_ps(N / 2.f);
     const auto UB = _mm_set1_ps(N - 1.f);
     const auto zero = _mm_setzero_ps();
