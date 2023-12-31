@@ -1,6 +1,9 @@
 #ifndef SST_WAVESHAPERS_WAVESHAPERCONFIGURATION_H
 #define SST_WAVESHAPERS_WAVESHAPERCONFIGURATION_H
 
+#include <vector>
+#include <utility>
+
 namespace sst::waveshapers
 {
 
@@ -110,6 +113,74 @@ const char wst_names[(int)WaveshaperType::n_ws_types][32] = {"Off",
                                                              "Medium",
                                                              "OJD",
                                                              "Soft Single Fold"};
+
+inline std::vector<std::pair<int, std::string>> WaveshaperGroupName()
+{
+    static std::vector<std::pair<int, std::string>> mapping;
+    if (mapping.empty())
+    {
+        auto lmap = mapping;
+        auto p = [&lmap](sst::waveshapers::WaveshaperType i, const std::string &s) {
+            lmap.emplace_back((int)i, s);
+        };
+
+        // Obviously improve this
+        p(sst::waveshapers::WaveshaperType::wst_none, "");
+
+        p(sst::waveshapers::WaveshaperType::wst_soft, "Saturator");
+        p(sst::waveshapers::WaveshaperType::wst_zamsat, "Saturator");
+        p(sst::waveshapers::WaveshaperType::wst_hard, "Saturator");
+        p(sst::waveshapers::WaveshaperType::wst_asym, "Saturator");
+        p(sst::waveshapers::WaveshaperType::wst_ojd, "Saturator");
+
+        p(sst::waveshapers::WaveshaperType::wst_sine, "Effect");
+        p(sst::waveshapers::WaveshaperType::wst_digital, "Effect");
+
+        p(sst::waveshapers::WaveshaperType::wst_cheby2, "Harmonic");
+        p(sst::waveshapers::WaveshaperType::wst_cheby3, "Harmonic");
+        p(sst::waveshapers::WaveshaperType::wst_cheby4, "Harmonic");
+        p(sst::waveshapers::WaveshaperType::wst_cheby5, "Harmonic");
+
+        p(sst::waveshapers::WaveshaperType::wst_add12, "Harmonic");
+        p(sst::waveshapers::WaveshaperType::wst_add13, "Harmonic");
+        p(sst::waveshapers::WaveshaperType::wst_add14, "Harmonic");
+        p(sst::waveshapers::WaveshaperType::wst_add15, "Harmonic");
+        p(sst::waveshapers::WaveshaperType::wst_add12345, "Harmonic");
+        p(sst::waveshapers::WaveshaperType::wst_addsaw3, "Harmonic");
+        p(sst::waveshapers::WaveshaperType::wst_addsqr3, "Harmonic");
+
+        p(sst::waveshapers::WaveshaperType::wst_fwrectify, "Rectifiers");
+        p(sst::waveshapers::WaveshaperType::wst_poswav, "Rectifiers");
+        p(sst::waveshapers::WaveshaperType::wst_negwav, "Rectifiers");
+        p(sst::waveshapers::WaveshaperType::wst_softrect, "Rectifiers");
+
+        p(sst::waveshapers::WaveshaperType::wst_softfold, "Wavefolder");
+        p(sst::waveshapers::WaveshaperType::wst_singlefold, "Wavefolder");
+        p(sst::waveshapers::WaveshaperType::wst_dualfold, "Wavefolder");
+        p(sst::waveshapers::WaveshaperType::wst_westfold, "Wavefolder");
+
+        p(sst::waveshapers::WaveshaperType::wst_fuzz, "Fuzz");
+        p(sst::waveshapers::WaveshaperType::wst_fuzzheavy, "Fuzz");
+        p(sst::waveshapers::WaveshaperType::wst_fuzzctr, "Fuzz");
+        p(sst::waveshapers::WaveshaperType::wst_fuzzsoft, "Fuzz");
+        p(sst::waveshapers::WaveshaperType::wst_fuzzsoftedge, "Fuzz");
+
+        p(sst::waveshapers::WaveshaperType::wst_sinpx, "Trigonometric");
+        p(sst::waveshapers::WaveshaperType::wst_sin2xpb, "Trigonometric");
+        p(sst::waveshapers::WaveshaperType::wst_sin3xpb, "Trigonometric");
+        p(sst::waveshapers::WaveshaperType::wst_sin7xpb, "Trigonometric");
+        p(sst::waveshapers::WaveshaperType::wst_sin10xpb, "Trigonometric");
+        p(sst::waveshapers::WaveshaperType::wst_2cyc, "Trigonometric");
+        p(sst::waveshapers::WaveshaperType::wst_7cyc, "Trigonometric");
+        p(sst::waveshapers::WaveshaperType::wst_10cyc, "Trigonometric");
+        p(sst::waveshapers::WaveshaperType::wst_2cycbound, "Trigonometric");
+        p(sst::waveshapers::WaveshaperType::wst_7cycbound, "Trigonometric");
+        p(sst::waveshapers::WaveshaperType::wst_10cycbound, "Trigonometric");
+
+        mapping = lmap;
+    }
+    return mapping;
+}
 } // namespace sst::waveshapers
 
 #endif // SST_WAVESHAPERS_WAVESHAPERCONFIGURATION_H
