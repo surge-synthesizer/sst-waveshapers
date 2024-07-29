@@ -30,4 +30,4 @@
 #include "simde/x86/sse2.h"
 #endif
 
-#endif //SST_WAVESHAPERS_GLOBALS_H
+#endif // SST_WAVESHAPERS_GLOBALS_H
