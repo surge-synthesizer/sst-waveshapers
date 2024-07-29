@@ -48,7 +48,8 @@ inline __m128 SINUS_SSE2(QuadWaveshaperState *__restrict s, __m128 in, __m128 dr
     _mm_store_si128((__m128i *)&e4, e);
 #endif
 
-    const auto& table = globalWaveshaperTables.waveshapers[static_cast<int> (WaveshaperType::wst_sine)];
+    const auto &table =
+        globalWaveshaperTables.waveshapers[static_cast<int>(WaveshaperType::wst_sine)];
     __m128 ws1 = _mm_load_ss(&table[e4[0] & 0x3ff]);
     __m128 ws2 = _mm_load_ss(&table[e4[1] & 0x3ff]);
     __m128 ws3 = _mm_load_ss(&table[e4[2] & 0x3ff]);
