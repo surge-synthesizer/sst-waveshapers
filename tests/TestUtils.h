@@ -45,10 +45,10 @@ inline void runTest(const TestConfig &config)
         auto output = wsPtr(&wsState, input, drive);
 
         float outArr alignas(16)[4];
-        _mm_store_ps (outArr, output);
+        _mm_store_ps(outArr, output);
         actualData[i] = outArr[0];
 
-        if constexpr (! printData)
+        if constexpr (!printData)
             REQUIRE(actualData[i] == Approx(config.expectedData[i]).margin(1.0e-4f));
     }
 
