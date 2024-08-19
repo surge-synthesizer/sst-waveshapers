@@ -79,6 +79,10 @@ inline QuadWaveshaperPtr GetQuadWaveshaper(WaveshaperType type)
         return WAVEFOLDER<dualFoldADAA>;
     case WaveshaperType::wst_westfold:
         return WAVEFOLDER<westCoastFoldADAA>;
+    case WaveshaperType::wst_linearfold:
+        return LINFOLD_SSE2;
+    case WaveshaperType::wst_sinefold:
+        return SINEFOLD_SSE2;
 
     // fuzzes
     case WaveshaperType::wst_fuzz:

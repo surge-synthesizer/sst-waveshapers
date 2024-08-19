@@ -125,6 +125,98 @@ inline __m128 SoftOneFold(QuadWaveshaperState *__restrict, __m128 x, __m128 driv
 
     return _mm_mul_ps(y, _mm_rcp_ps(num));
 }
+
+inline __m128 LINFOLD_SSE2(QuadWaveshaperState *__restrict s, __m128 in, __m128 drive)
+{
+    // The following code is heavily derived from Vital's linear fold (GPLv3, compatible with SST)
+    // I think there might be some optimizations to be done here, but I haven't messed with it yet
+    // Lots of constants, yikes
+    const __m128 mfour = _mm_set1_ps(-4.f);
+    const __m128 two = _mm_set1_ps(2.f);
+    const __m128 one = _mm_set1_ps(1.f);
+    const __m128 p75 = _mm_set1_ps(0.75f);
+    const __m128 p25 = _mm_set1_ps(0.25f);
+    const __m128 zero = _mm_set1_ps(0.f);
+
+    __m128 x = _mm_mul_ps(in, drive);
+    // Prescale the input value
+    x = _mm_mul_ps(x, p25);
+    x = _mm_add_ps(x, p75);
+
+    // Now, perform a modulus by 1
+    __m128i e = _mm_cvtps_epi32(x);
+    __m128 a = _mm_sub_ps(x, _mm_cvtepi32_ps(e));
+    a = _mm_add_ps(a, _mm_and_ps(one, _mm_cmplt_ps(a, zero)));
+
+    // Finally, scale the output value
+    a = _mm_mul_ps(a, mfour);
+    a = _mm_add_ps(a, two);
+    
+    // Absolute value
+    uint32_t v = 0x7fffffff; // Trick C++ into initializing a float mask that clears the sign bit
+    a = _mm_and_ps(a, _mm_set1_ps(*((float*)&v)));
+
+    // Now finish up by shifting down a bit...
+    a = _mm_sub_ps(a, one);
+
+    return a;
+}
+
+inline __m128 SINEFOLD_SSE2(QuadWaveshaperState *__restrict s, __m128 in, __m128 drive)
+{
+    // This code starts with a custom bit to make it fold, then is just a copy of SINUS_SSE2
+    const __m128 one = _mm_set1_ps(1.f);
+    const __m128 m256 = _mm_set1_ps(256.f);
+    const __m128 m512 = _mm_set1_ps(512.f);
+
+    // Scale so that -1.0 - 1.0 goes to 256 - 768
+    // +6 dB gets you the full sine wave
+    __m128 x = _mm_mul_ps(in, drive);
+    x = _mm_add_ps(_mm_mul_ps(x, m256), m512);
+
+    // Convert to 32 bit ints
+    __m128i e = _mm_cvtps_epi32(x);
+    // Calculate the remainder due to truncation. This is used for later interpolation
+    __m128 a = _mm_sub_ps(x, _mm_cvtepi32_ps(e));
+    // Now, make sure the fold pattern repeats
+    // Fortunately, we're dealing with a power-of-two LUT so we can do a modulus by bitwise and like so:
+    e = _mm_and_si128(e, _mm_set1_epi32(0x3ff));
+    // Now pack into 16 bit ints. Should already be truncated
+    // If not, whoops, segfault
+    e = _mm_packs_epi32(e, e);
+
+    // And the rest of this is just copied from SINUS
+#if MAC
+    // this should be very fast on C2D/C1D (and there are no macs with K8's)
+    // GCC seems to optimize around the XMM -> int transfers so this is needed here
+    int e4 alignas(16)[4];
+    e4[0] = _mm_cvtsi128_si32(e);
+    e4[1] = _mm_cvtsi128_si32(_mm_shufflelo_epi16(e, _MM_SHUFFLE(1, 1, 1, 1)));
+    e4[2] = _mm_cvtsi128_si32(_mm_shufflelo_epi16(e, _MM_SHUFFLE(2, 2, 2, 2)));
+    e4[3] = _mm_cvtsi128_si32(_mm_shufflelo_epi16(e, _MM_SHUFFLE(3, 3, 3, 3)));
+#else
+    // on PC write to memory & back as XMM -> GPR is slow on K8
+    short e4 alignas(16)[8];
+    _mm_store_si128((__m128i *)&e4, e);
+#endif
+
+    const auto &table =
+        globalWaveshaperTables.waveshapers[static_cast<int>(WaveshaperType::wst_sine)];
+    __m128 ws1 = _mm_load_ss(&table[e4[0] & 0x3ff]);
+    __m128 ws2 = _mm_load_ss(&table[e4[1] & 0x3ff]);
+    __m128 ws3 = _mm_load_ss(&table[e4[2] & 0x3ff]);
+    __m128 ws4 = _mm_load_ss(&table[e4[3] & 0x3ff]);
+    __m128 ws = _mm_movelh_ps(_mm_unpacklo_ps(ws1, ws2), _mm_unpacklo_ps(ws3, ws4));
+    ws1 = _mm_load_ss(&table[(e4[0] + 1) & 0x3ff]);
+    ws2 = _mm_load_ss(&table[(e4[1] + 1) & 0x3ff]);
+    ws3 = _mm_load_ss(&table[(e4[2] + 1) & 0x3ff]);
+    ws4 = _mm_load_ss(&table[(e4[3] + 1) & 0x3ff]);
+    __m128 wsn = _mm_movelh_ps(_mm_unpacklo_ps(ws1, ws2), _mm_unpacklo_ps(ws3, ws4));
+
+    x = _mm_add_ps(_mm_mul_ps(_mm_sub_ps(one, a), ws), _mm_mul_ps(a, wsn));
+
+    return x;
+}
 } // namespace sst::waveshapers
 
 #endif // SST_WAVESHAPERS_WAVEFOLDERS_H

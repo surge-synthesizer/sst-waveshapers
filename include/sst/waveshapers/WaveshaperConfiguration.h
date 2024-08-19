@@ -30,6 +30,8 @@ enum class WaveshaperType
     wst_singlefold,
     wst_dualfold,
     wst_westfold,
+    wst_linearfold,
+    wst_sinefold,
 
     // additive harmonics
     wst_add12,
