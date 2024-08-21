@@ -76,6 +76,7 @@ const char wst_names[(int)WaveshaperType::n_ws_types][32] = {"Off",
                                                              "Asymmetric",
                                                              "Sine",
                                                              "Digital",
+                                                             
                                                              "Soft Harmonic 2",
                                                              "Soft Harmonic 3",
                                                              "Soft Harmonic 4",
@@ -87,6 +88,9 @@ const char wst_names[(int)WaveshaperType::n_ws_types][32] = {"Off",
                                                              "Single Fold",
                                                              "Double Fold",
                                                              "West Coast Fold",
+                                                             "Linear Fold",
+                                                             "Sine Fold",
+
                                                              "Additive 1+2",
                                                              "Additive 1+3",
                                                              "Additive 1+4",
@@ -160,6 +164,8 @@ inline std::vector<std::pair<int, std::string>> WaveshaperGroupName()
         p(sst::waveshapers::WaveshaperType::wst_singlefold, "Wavefolder");
         p(sst::waveshapers::WaveshaperType::wst_dualfold, "Wavefolder");
         p(sst::waveshapers::WaveshaperType::wst_westfold, "Wavefolder");
+        p(sst::waveshapers::WaveshaperType::wst_linearfold, "Wavefolder");
+        p(sst::waveshapers::WaveshaperType::wst_sinefold, "Wavefolder");
 
         p(sst::waveshapers::WaveshaperType::wst_fuzz, "Fuzz");
         p(sst::waveshapers::WaveshaperType::wst_fuzzheavy, "Fuzz");
