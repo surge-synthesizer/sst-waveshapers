@@ -19,7 +19,7 @@ inline __m128 DIGI_SSE2(QuadWaveshaperState *__restrict, __m128 in, __m128 drive
     return _mm_mul_ps(drive, _mm_mul_ps(m16inv, _mm_sub_ps(_mm_cvtepi32_ps(a), mofs)));
 }
 
-template<bool DO_FOLD = false>
+template <bool DO_FOLD = false>
 inline __m128 SINUS_SSE2(QuadWaveshaperState *__restrict s, __m128 in, __m128 drive)
 {
     const __m128 one = _mm_set1_ps(1.f);
@@ -37,14 +37,18 @@ inline __m128 SINUS_SSE2(QuadWaveshaperState *__restrict s, __m128 in, __m128 dr
     __m128 a = _mm_sub_ps(x, _mm_cvtepi32_ps(e));
 
     // Template arg -- Compiler will optimize this out
-    if (DO_FOLD) {
+    if (DO_FOLD)
+    {
         // Now, make sure the fold pattern repeats
-        // Fortunately, we're dealing with a power-of-two LUT so we can do a modulus by bitwise and like so:
+        // Fortunately, we're dealing with a power-of-two LUT so we can do a modulus by bitwise and
+        // like so:
         e = _mm_and_si128(e, _mm_set1_epi32(0x3ff));
         // Now pack into 16 bit ints. Should already be truncated
         // If not, whoops, segfault
         e = _mm_packs_epi32(e, e);
-    } else {
+    }
+    else
+    {
         // Don't repeat; Instead, clip to zero at the boundaries
         e = _mm_packs_epi32(e, e);
         const __m128i UB = _mm_set1_epi16(0x3fe);

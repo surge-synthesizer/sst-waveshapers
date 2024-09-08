@@ -151,10 +151,10 @@ inline __m128 LINFOLD_SSE2(QuadWaveshaperState *__restrict s, __m128 in, __m128 
     // Finally, scale the output value
     a = _mm_mul_ps(a, mfour);
     a = _mm_add_ps(a, two);
-    
+
     // Absolute value
     uint32_t v = 0x7fffffff; // Trick C++ into initializing a float mask that clears the sign bit
-    a = _mm_and_ps(a, _mm_set1_ps(*((float*)&v)));
+    a = _mm_and_ps(a, _mm_set1_ps(*((float *)&v)));
 
     // Now finish up by shifting down a bit...
     a = _mm_sub_ps(a, one);

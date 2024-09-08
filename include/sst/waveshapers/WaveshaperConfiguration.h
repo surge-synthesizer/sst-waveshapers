@@ -7,6 +7,8 @@
 namespace sst::waveshapers
 {
 
+// Since these are streamed in some properties, please only add items to the end
+// Grouping and ordering in uis happens via the groupname below not the order here
 enum class WaveshaperType
 {
     wst_none = 0,
@@ -30,8 +32,6 @@ enum class WaveshaperType
     wst_singlefold,
     wst_dualfold,
     wst_westfold,
-    wst_linearfold,
-    wst_sinefold,
 
     // additive harmonics
     wst_add12,
@@ -67,58 +67,63 @@ enum class WaveshaperType
 
     wst_softfold,
 
+    wst_linearfold,
+    wst_sinefold,
+
     n_ws_types,
 };
 
-const char wst_names[(int)WaveshaperType::n_ws_types][32] = {"Off",
-                                                             "Soft",
-                                                             "Hard",
-                                                             "Asymmetric",
-                                                             "Sine",
-                                                             "Digital",
-                                                             
-                                                             "Soft Harmonic 2",
-                                                             "Soft Harmonic 3",
-                                                             "Soft Harmonic 4",
-                                                             "Soft Harmonic 5",
-                                                             "Full Wave",
-                                                             "Half Wave Positive",
-                                                             "Half Wave Negative",
-                                                             "Soft Rectifier",
-                                                             "Single Fold",
-                                                             "Double Fold",
-                                                             "West Coast Fold",
-                                                             "Linear Fold",
-                                                             "Sine Fold",
+const char wst_names[(int)WaveshaperType::n_ws_types][32] = {
+    "Off",
+    "Soft",
+    "Hard",
+    "Asymmetric",
+    "Sine",
+    "Digital",
 
-                                                             "Additive 1+2",
-                                                             "Additive 1+3",
-                                                             "Additive 1+4",
-                                                             "Additive 1+5",
-                                                             "Additive 12345",
-                                                             "Additive Saw 3",
-                                                             "Additive Square 3",
+    "Soft Harmonic 2",
+    "Soft Harmonic 3",
+    "Soft Harmonic 4",
+    "Soft Harmonic 5",
+    "Full Wave",
+    "Half Wave Positive",
+    "Half Wave Negative",
+    "Soft Rectifier",
+    "Single Fold",
+    "Double Fold",
+    "West Coast Fold",
 
-                                                             "Fuzz",
-                                                             "Fuzz Soft Clip",
-                                                             "Heavy Fuzz",
-                                                             "Fuzz Center",
-                                                             "Fuzz Soft Edge",
+    "Additive 1+2",
+    "Additive 1+3",
+    "Additive 1+4",
+    "Additive 1+5",
+    "Additive 12345",
+    "Additive Saw 3",
+    "Additive Square 3",
 
-                                                             "Sin+x",
-                                                             "Sin 2x + x",
-                                                             "Sin 3x + x",
-                                                             "Sin 7x + x",
-                                                             "Sin 10x + x",
-                                                             "2 Cycle",
-                                                             "7 Cycle",
-                                                             "10 Cycle",
-                                                             "2 Cycle Bound",
-                                                             "7 Cycle Bound",
-                                                             "10 Cycle Bound",
-                                                             "Medium",
-                                                             "OJD",
-                                                             "Soft Single Fold"};
+    "Fuzz",
+    "Fuzz Soft Clip",
+    "Heavy Fuzz",
+    "Fuzz Center",
+    "Fuzz Soft Edge",
+
+    "Sin+x",
+    "Sin 2x + x",
+    "Sin 3x + x",
+    "Sin 7x + x",
+    "Sin 10x + x",
+    "2 Cycle",
+    "7 Cycle",
+    "10 Cycle",
+    "2 Cycle Bound",
+    "7 Cycle Bound",
+    "10 Cycle Bound",
+    "Medium",
+    "OJD",
+    "Soft Single Fold",
+    "Linear Fold",
+    "Sine Fold",
+};
 
 inline std::vector<std::pair<int, std::string>> WaveshaperGroupName()
 {
