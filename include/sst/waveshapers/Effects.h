@@ -19,20 +19,41 @@ inline __m128 DIGI_SSE2(QuadWaveshaperState *__restrict, __m128 in, __m128 drive
     return _mm_mul_ps(drive, _mm_mul_ps(m16inv, _mm_sub_ps(_mm_cvtepi32_ps(a), mofs)));
 }
 
+template <bool DO_FOLD = false>
 inline __m128 SINUS_SSE2(QuadWaveshaperState *__restrict s, __m128 in, __m128 drive)
 {
     const __m128 one = _mm_set1_ps(1.f);
     const __m128 m256 = _mm_set1_ps(256.f);
     const __m128 m512 = _mm_set1_ps(512.f);
 
+    // Scale so that -1.0 - 1.0 goes to 256 - 768
+    // +6 dB gets you the full sine wave
     __m128 x = _mm_mul_ps(in, drive);
     x = _mm_add_ps(_mm_mul_ps(x, m256), m512);
 
+    // Convert to 32 bit ints
     __m128i e = _mm_cvtps_epi32(x);
+    // Calculate the remainder due to truncation. This is used for later interpolation
     __m128 a = _mm_sub_ps(x, _mm_cvtepi32_ps(e));
-    e = _mm_packs_epi32(e, e);
-    const __m128i UB = _mm_set1_epi16(0x3fe);
-    e = _mm_max_epi16(_mm_min_epi16(e, UB), _mm_setzero_si128());
+
+    // Template arg -- Compiler will optimize this out
+    if (DO_FOLD)
+    {
+        // Now, make sure the fold pattern repeats
+        // Fortunately, we're dealing with a power-of-two LUT so we can do a modulus by bitwise and
+        // like so:
+        e = _mm_and_si128(e, _mm_set1_epi32(0x3ff));
+        // Now pack into 16 bit ints. Should already be truncated
+        // If not, whoops, segfault
+        e = _mm_packs_epi32(e, e);
+    }
+    else
+    {
+        // Don't repeat; Instead, clip to zero at the boundaries
+        e = _mm_packs_epi32(e, e);
+        const __m128i UB = _mm_set1_epi16(0x3fe);
+        e = _mm_max_epi16(_mm_min_epi16(e, UB), _mm_setzero_si128());
+    }
 
 #if MAC
     // this should be very fast on C2D/C1D (and there are no macs with K8's)

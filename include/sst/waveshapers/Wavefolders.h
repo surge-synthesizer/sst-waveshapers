@@ -125,6 +125,45 @@ inline __m128 SoftOneFold(QuadWaveshaperState *__restrict, __m128 x, __m128 driv
 
     return _mm_mul_ps(y, _mm_rcp_ps(num));
 }
+
+inline __m128 LINFOLD_SSE2(QuadWaveshaperState *__restrict s, __m128 in, __m128 drive)
+{
+    // The following code is heavily derived from Vital's linear fold (GPLv3, compatible with SST)
+    // I think there might be some optimizations to be done here, but I haven't messed with it yet
+    // Lots of constants, yikes
+    const __m128 mfour = _mm_set1_ps(-4.f);
+    const __m128 two = _mm_set1_ps(2.f);
+    const __m128 one = _mm_set1_ps(1.f);
+    const __m128 p75 = _mm_set1_ps(0.75f);
+    const __m128 p25 = _mm_set1_ps(0.25f);
+    const __m128 zero = _mm_set1_ps(0.f);
+
+    __m128 x = _mm_mul_ps(in, drive);
+    // Prescale the input value
+    x = _mm_mul_ps(x, p25);
+    x = _mm_add_ps(x, p75);
+
+    // Now, perform a modulus by 1
+    __m128i e = _mm_cvtps_epi32(x);
+    __m128 a = _mm_sub_ps(x, _mm_cvtepi32_ps(e));
+    a = _mm_add_ps(a, _mm_and_ps(one, _mm_cmplt_ps(a, zero)));
+
+    // Finally, scale the output value
+    a = _mm_mul_ps(a, mfour);
+    a = _mm_add_ps(a, two);
+
+    // Absolute value
+    uint32_t v = 0x7fffffff; // Trick C++ into initializing a float mask that clears the sign bit
+    a = _mm_and_ps(a, _mm_set1_ps(*((float *)&v)));
+
+    // Now finish up by shifting down a bit...
+    a = _mm_sub_ps(a, one);
+
+    return a;
+}
+
+// Sine fold is implemented in SINUS_SSE2 in Effects.h via template args
+
 } // namespace sst::waveshapers
 
 #endif // SST_WAVESHAPERS_WAVEFOLDERS_H
