@@ -43,6 +43,22 @@ struct WaveshaperTables
 };
 
 const static WaveshaperTables globalWaveshaperTables;
+
+static inline double lookup_waveshape(sst::waveshapers::WaveshaperType entry, double x)
+{
+    x *= 32.f;
+    x += 512.f;
+    int e = (int)x;
+    float a = x - (float)e;
+
+    if (e > 0x3fd)
+        return 1;
+    if (e < 1)
+        return -1;
+
+    const auto &waveshapers = globalWaveshaperTables.waveshapers[(int)entry];
+    return (1 - a) * waveshapers[e & 0x3ff] + a * waveshapers[(e + 1) & 0x3ff];
+}
 } // namespace sst::waveshapers
 
 #endif // SST_WAVESHAPERS_WAVESHAPERTABLES_H
