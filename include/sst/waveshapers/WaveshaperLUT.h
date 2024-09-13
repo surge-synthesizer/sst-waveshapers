@@ -58,7 +58,6 @@ template <int N> __m128 WS_PM1_LUT(const float *table, __m128 in)
 {
     const auto one = _mm_set1_ps(1.f);
     const auto dx = _mm_set1_ps(N / 2.f);
-    const auto oodx = _mm_set1_ps(2.f / N);
     const auto ctr = _mm_set1_ps(N / 2.f);
     const auto UB = _mm_set1_ps(N - 1.f);
     const auto zero = _mm_setzero_ps();
@@ -105,7 +104,8 @@ template <int NP, float F(const float)> struct LUTBase
     }
 };
 
-template <float F(float), int N, __m128 C(QuadWaveshaperState *__restrict, __m128, __m128), bool block = true>
+template <float F(float), int N, __m128 C(QuadWaveshaperState *__restrict, __m128, __m128),
+          bool block = true>
 __m128 TableEval(QuadWaveshaperState *__restrict s, __m128 x, __m128 drive)
 {
     static LUTBase<N, F> table;
@@ -114,6 +114,6 @@ __m128 TableEval(QuadWaveshaperState *__restrict s, __m128 x, __m128 drive)
     else
         return WS_PM1_LUT<N>(table.data, C(s, x, drive));
 }
-}
+} // namespace sst::waveshapers
 
 #endif // SST_WAVESHAPERS_WAVESHAPERLUT_H
