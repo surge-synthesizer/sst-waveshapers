@@ -67,8 +67,10 @@ enum class WaveshaperType
 
     wst_softfold,
 
+#ifndef SURGE_XT_1X_WST
     wst_linearfold,
     wst_sinefold,
+#endif
 
     n_ws_types,
 };
@@ -121,8 +123,11 @@ const char wst_names[(int)WaveshaperType::n_ws_types][32] = {
     "Medium",
     "OJD",
     "Soft Single Fold",
+
+#ifndef SURGE_XT_1X_WST
     "Linear Fold",
     "Sine Fold",
+#endif
 };
 
 inline std::vector<std::pair<int, std::string>> WaveshaperGroupName()
@@ -169,8 +174,11 @@ inline std::vector<std::pair<int, std::string>> WaveshaperGroupName()
         p(sst::waveshapers::WaveshaperType::wst_singlefold, "Wavefolder");
         p(sst::waveshapers::WaveshaperType::wst_dualfold, "Wavefolder");
         p(sst::waveshapers::WaveshaperType::wst_westfold, "Wavefolder");
+
+#ifndef SURGE_XT_1X_WST
         p(sst::waveshapers::WaveshaperType::wst_linearfold, "Wavefolder");
         p(sst::waveshapers::WaveshaperType::wst_sinefold, "Wavefolder");
+#endif
 
         p(sst::waveshapers::WaveshaperType::wst_fuzz, "Fuzz");
         p(sst::waveshapers::WaveshaperType::wst_fuzzheavy, "Fuzz");
