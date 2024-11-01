@@ -8,82 +8,83 @@
 namespace sst::waveshapers
 {
 template <int xRes, int xCenter, int size>
-__m128 WS_LUT(QuadWaveshaperState *__restrict, const float *table, __m128 in, __m128 drive)
+SIMD_M128 WS_LUT(QuadWaveshaperState *__restrict, const float *table, SIMD_M128 in, SIMD_M128 drive)
 {
-    const __m128 one = _mm_set1_ps(1.f);
-    const __m128 m32 = _mm_set1_ps(xRes);
-    const __m128 m512 = _mm_set1_ps(xCenter);
-    const __m128i UB = _mm_set1_epi16(size - 1);
+    const auto one = SIMD_MM(set1_ps)(1.f);
+    const auto m32 = SIMD_MM(set1_ps)(xRes);
+    const auto m512 = SIMD_MM(set1_ps)(xCenter);
+    const SIMD_M128I UB = SIMD_MM(set1_epi16)(size - 1);
 
-    __m128 x = _mm_mul_ps(in, drive);
-    x = _mm_add_ps(_mm_mul_ps(x, m32), m512);
+    auto x = SIMD_MM(mul_ps)(in, drive);
+    x = SIMD_MM(add_ps)(SIMD_MM(mul_ps)(x, m32), m512);
 
-    __m128i e = _mm_cvtps_epi32(x);
-    __m128 a = _mm_sub_ps(x, _mm_cvtepi32_ps(e));
-    e = _mm_packs_epi32(e, e);
-    e = _mm_max_epi16(_mm_min_epi16(e, UB), _mm_setzero_si128());
+    SIMD_M128I e = SIMD_MM(cvtps_epi32)(x);
+    auto a = SIMD_MM(sub_ps)(x, SIMD_MM(cvtepi32_ps)(e));
+    e = SIMD_MM(packs_epi32)(e, e);
+    e = SIMD_MM(max_epi16)(SIMD_MM(min_epi16)(e, UB), SIMD_MM(setzero_si128)());
 
 #if MAC
     // this should be very fast on C2D/C1D (and there are no macs with K8's)
     int e4 alignas(16)[4];
-    e4[0] = _mm_cvtsi128_si32(e);
-    e4[1] = _mm_cvtsi128_si32(_mm_shufflelo_epi16(e, _MM_SHUFFLE(1, 1, 1, 1)));
-    e4[2] = _mm_cvtsi128_si32(_mm_shufflelo_epi16(e, _MM_SHUFFLE(2, 2, 2, 2)));
-    e4[3] = _mm_cvtsi128_si32(_mm_shufflelo_epi16(e, _MM_SHUFFLE(3, 3, 3, 3)));
+    e4[0] = SIMD_MM(cvtsi128_si32)(e);
+    e4[1] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMDSIMD_MM_SHUFFLE(1, 1, 1, 1)));
+    e4[2] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMDSIMD_MM_SHUFFLE(2, 2, 2, 2)));
+    e4[3] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMDSIMD_MM_SHUFFLE(3, 3, 3, 3)));
 
 #else
     // on PC write to memory & back as XMM -> GPR is slow on K8
     short e4 alignas(16)[8];
-    _mm_store_si128((__m128i *)&e4, e);
+    SIMD_MM(store_si128)((SIMD_M128I *)&e4, e);
 #endif
 
-    __m128 ws1 = _mm_load_ss(&table[e4[0] & size]);
-    __m128 ws2 = _mm_load_ss(&table[e4[1] & size]);
-    __m128 ws3 = _mm_load_ss(&table[e4[2] & size]);
-    __m128 ws4 = _mm_load_ss(&table[e4[3] & size]);
-    __m128 ws = _mm_movelh_ps(_mm_unpacklo_ps(ws1, ws2), _mm_unpacklo_ps(ws3, ws4));
-    ws1 = _mm_load_ss(&table[(e4[0] + 1) & size]);
-    ws2 = _mm_load_ss(&table[(e4[1] + 1) & size]);
-    ws3 = _mm_load_ss(&table[(e4[2] + 1) & size]);
-    ws4 = _mm_load_ss(&table[(e4[3] + 1) & size]);
-    __m128 wsn = _mm_movelh_ps(_mm_unpacklo_ps(ws1, ws2), _mm_unpacklo_ps(ws3, ws4));
+    auto ws1 = SIMD_MM(load_ss)(&table[e4[0] & size]);
+    auto ws2 = SIMD_MM(load_ss)(&table[e4[1] & size]);
+    auto ws3 = SIMD_MM(load_ss)(&table[e4[2] & size]);
+    auto ws4 = SIMD_MM(load_ss)(&table[e4[3] & size]);
+    auto ws = SIMD_MM(movelh_ps)(SIMD_MM(unpacklo_ps)(ws1, ws2), SIMD_MM(unpacklo_ps)(ws3, ws4));
+    ws1 = SIMD_MM(load_ss)(&table[(e4[0] + 1) & size]);
+    ws2 = SIMD_MM(load_ss)(&table[(e4[1] + 1) & size]);
+    ws3 = SIMD_MM(load_ss)(&table[(e4[2] + 1) & size]);
+    ws4 = SIMD_MM(load_ss)(&table[(e4[3] + 1) & size]);
+    auto wsn = SIMD_MM(movelh_ps)(SIMD_MM(unpacklo_ps)(ws1, ws2), SIMD_MM(unpacklo_ps)(ws3, ws4));
 
-    x = _mm_add_ps(_mm_mul_ps(_mm_sub_ps(one, a), ws), _mm_mul_ps(a, wsn));
+    x = SIMD_MM(add_ps)(SIMD_MM(mul_ps)(SIMD_MM(sub_ps)(one, a), ws), SIMD_MM(mul_ps)(a, wsn));
 
     return x;
 }
 
 // Given a table of size N+1, N a power of 2, representing data between -1 and 1, interp
-template <int N> __m128 WS_PM1_LUT(const float *table, __m128 in)
+template <int N> SIMD_M128 WS_PM1_LUT(const float *table, SIMD_M128 in)
 {
-    const auto one = _mm_set1_ps(1.f);
-    const auto dx = _mm_set1_ps(N / 2.f);
-    const auto ctr = _mm_set1_ps(N / 2.f);
-    const auto UB = _mm_set1_ps(N - 1.f);
-    const auto zero = _mm_setzero_ps();
+    const auto one = SIMD_MM(set1_ps)(1.f);
+    const auto dx = SIMD_MM(set1_ps)(N / 2.f);
+    const auto ctr = SIMD_MM(set1_ps)(N / 2.f);
+    const auto UB = SIMD_MM(set1_ps)(N - 1.f);
+    const auto zero = SIMD_MM(setzero_ps)();
 
-    auto x = _mm_add_ps(_mm_mul_ps(in, dx), ctr);
-    auto e = _mm_cvtps_epi32(_mm_max_ps(_mm_min_ps(x, UB), zero));
-    auto a = _mm_cvtepi32_ps(e);
-    auto frac = _mm_sub_ps(x, a);
-    e = _mm_packs_epi32(e, e);
+    auto x = SIMD_MM(add_ps)(SIMD_MM(mul_ps)(in, dx), ctr);
+    auto e = SIMD_MM(cvtps_epi32)(SIMD_MM(max_ps)(SIMD_MM(min_ps)(x, UB), zero));
+    auto a = SIMD_MM(cvtepi32_ps)(e);
+    auto frac = SIMD_MM(sub_ps)(x, a);
+    e = SIMD_MM(packs_epi32)(e, e);
 
     // on PC write to memory & back as XMM -> GPR is slow on K8
     short e4 alignas(16)[8];
-    _mm_store_si128((__m128i *)&e4, e);
+    SIMD_MM(store_si128)((SIMD_M128I *)&e4, e);
 
-    __m128 ws1 = _mm_load_ss(&table[e4[0]]);
-    __m128 ws2 = _mm_load_ss(&table[e4[1]]);
-    __m128 ws3 = _mm_load_ss(&table[e4[2]]);
-    __m128 ws4 = _mm_load_ss(&table[e4[3]]);
-    __m128 ws = _mm_movelh_ps(_mm_unpacklo_ps(ws1, ws2), _mm_unpacklo_ps(ws3, ws4));
-    ws1 = _mm_load_ss(&table[(e4[0] + 1)]);
-    ws2 = _mm_load_ss(&table[(e4[1] + 1)]);
-    ws3 = _mm_load_ss(&table[(e4[2] + 1)]);
-    ws4 = _mm_load_ss(&table[(e4[3] + 1)]);
-    __m128 wsn = _mm_movelh_ps(_mm_unpacklo_ps(ws1, ws2), _mm_unpacklo_ps(ws3, ws4));
+    auto ws1 = SIMD_MM(load_ss)(&table[e4[0]]);
+    auto ws2 = SIMD_MM(load_ss)(&table[e4[1]]);
+    auto ws3 = SIMD_MM(load_ss)(&table[e4[2]]);
+    auto ws4 = SIMD_MM(load_ss)(&table[e4[3]]);
+    auto ws = SIMD_MM(movelh_ps)(SIMD_MM(unpacklo_ps)(ws1, ws2), SIMD_MM(unpacklo_ps)(ws3, ws4));
+    ws1 = SIMD_MM(load_ss)(&table[(e4[0] + 1)]);
+    ws2 = SIMD_MM(load_ss)(&table[(e4[1] + 1)]);
+    ws3 = SIMD_MM(load_ss)(&table[(e4[2] + 1)]);
+    ws4 = SIMD_MM(load_ss)(&table[(e4[3] + 1)]);
+    auto wsn = SIMD_MM(movelh_ps)(SIMD_MM(unpacklo_ps)(ws1, ws2), SIMD_MM(unpacklo_ps)(ws3, ws4));
 
-    auto res = _mm_add_ps(_mm_mul_ps(_mm_sub_ps(one, frac), ws), _mm_mul_ps(frac, wsn));
+    auto res = SIMD_MM(add_ps)(SIMD_MM(mul_ps)(SIMD_MM(sub_ps)(one, frac), ws),
+                               SIMD_MM(mul_ps)(frac, wsn));
 
     return res;
 }
@@ -104,9 +105,9 @@ template <int NP, float F(const float)> struct LUTBase
     }
 };
 
-template <float F(float), int N, __m128 C(QuadWaveshaperState *__restrict, __m128, __m128),
+template <float F(float), int N, SIMD_M128 C(QuadWaveshaperState *__restrict, SIMD_M128, SIMD_M128),
           bool block = true>
-__m128 TableEval(QuadWaveshaperState *__restrict s, __m128 x, __m128 drive)
+SIMD_M128 TableEval(QuadWaveshaperState *__restrict s, SIMD_M128 x, SIMD_M128 drive)
 {
     static LUTBase<N, F> table;
     if (block)

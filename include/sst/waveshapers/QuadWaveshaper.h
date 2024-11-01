@@ -16,11 +16,12 @@ constexpr int n_waveshaper_registers = 4;
  */
 struct alignas(16) QuadWaveshaperState
 {
-    __m128 R[n_waveshaper_registers];
-    __m128 init;
+    SIMD_M128 R[n_waveshaper_registers];
+    SIMD_M128 init;
 };
 
-typedef __m128 (*QuadWaveshaperPtr)(QuadWaveshaperState *__restrict, __m128 in, __m128 drive);
+typedef SIMD_M128 (*QuadWaveshaperPtr)(QuadWaveshaperState *__restrict, SIMD_M128 in,
+                                       SIMD_M128 drive);
 
 QuadWaveshaperPtr GetQuadWaveshaper(WaveshaperType type);
 

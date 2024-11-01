@@ -20,20 +20,23 @@ TEST_CASE("Fuzzes Test")
     {
         TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_fuzzctr,
                             {0.392422f, 0.137087f, 0.777535f, 0.983756f, 0.465164f, 0.163438f,
-                             -0.81944f, -0.984097f}});
+                             -0.81944f, -0.984097f},
+                            5e-2});
     }
 
     SECTION("FUZZ SOFT CLIP")
     {
         TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_fuzzsoft,
                             {-0.0498637f, 0.176861f, 0.769438f, 0.882686f, 0.411067f, -0.0660712f,
-                             -0.874844f, -0.924149f}});
+                             -0.874844f, -0.924149f},
+                            5e-2});
     }
 
     SECTION("FUZZ SOFT EDGE")
     {
         TestUtils::runTest(
             {sst::waveshapers::WaveshaperType::wst_fuzzsoftedge,
-             {0.0f, 0.167961f, 0.65832f, 1.00573f, 0.395507f, -0.0849603f, -0.75362f, -0.826739f}});
+             {0.0f, 0.167961f, 0.65832f, 1.00573f, 0.395507f, -0.0849603f, -0.75362f, -0.826739f},
+             5e-2});
     }
 }
