@@ -27,9 +27,9 @@ SIMD_M128 WS_LUT(QuadWaveshaperState *__restrict, const float *table, SIMD_M128 
     // this should be very fast on C2D/C1D (and there are no macs with K8's)
     int e4 alignas(16)[4];
     e4[0] = SIMD_MM(cvtsi128_si32)(e);
-    e4[1] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMDSIMD_MM_SHUFFLE(1, 1, 1, 1)));
-    e4[2] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMDSIMD_MM_SHUFFLE(2, 2, 2, 2)));
-    e4[3] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMDSIMD_MM_SHUFFLE(3, 3, 3, 3)));
+    e4[1] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMD_MM_SHUFFLE(1, 1, 1, 1)));
+    e4[2] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMD_MM_SHUFFLE(2, 2, 2, 2)));
+    e4[3] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMD_MM_SHUFFLE(3, 3, 3, 3)));
 
 #else
     // on PC write to memory & back as XMM -> GPR is slow on K8
