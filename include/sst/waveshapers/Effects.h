@@ -62,9 +62,9 @@ inline SIMD_M128 SINUS_SSE2(QuadWaveshaperState *__restrict s, SIMD_M128 in, SIM
     // GCC seems to optimize around the XMM -> int transfers so this is needed here
     int e4 alignas(16)[4];
     e4[0] = SIMD_MM(cvtsi128_si32)(e);
-    e4[1] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMDSIMD_MM_SHUFFLE(1, 1, 1, 1)));
-    e4[2] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMDSIMD_MM_SHUFFLE(2, 2, 2, 2)));
-    e4[3] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMDSIMD_MM_SHUFFLE(3, 3, 3, 3)));
+    e4[1] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMD_MM_SHUFFLE(1, 1, 1, 1)));
+    e4[2] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMD_MM_SHUFFLE(2, 2, 2, 2)));
+    e4[3] = SIMD_MM(cvtsi128_si32)(SIMD_MM(shufflelo_epi16)(e, SIMD_MM_SHUFFLE(3, 3, 3, 3)));
 #else
     // on PC write to memory & back as XMM -> GPR is slow on K8
     short e4 alignas(16)[8];
