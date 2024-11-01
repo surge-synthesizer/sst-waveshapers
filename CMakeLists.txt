@@ -27,11 +27,23 @@ if (SST_WAVESHAPERS_BUILD_TESTS)
     message(STATUS "Importing SIMDE with CPM")
     CPMAddPackage(NAME simde
             GITHUB_REPOSITORY simd-everywhere/simde
-            VERSION 0.7.2
+            VERSION 0.8.2
             )
     add_library(simde INTERFACE)
     target_include_directories(simde INTERFACE ${simde_SOURCE_DIR})
+
+    CPMAddPackage(NAME sst-basic-blocks
+            GITHUB_REPOSITORY surge-synthesizer/sst-basic-blocks
+            GIT_TAG main
+    )
+else()
+    if (NOT TARGET sst-basic-blocks)
+        message(FATAL_ERROR "SST Waveshapers requires sst-basic-blocks")
+    endif()
+
 endif ()
+
+target_link_libraries(${PROJECT_NAME} INTERFACE sst-basic-blocks)
 
 if (SST_WAVESHAPERS_BUILD_TESTS)
     add_subdirectory(tests)

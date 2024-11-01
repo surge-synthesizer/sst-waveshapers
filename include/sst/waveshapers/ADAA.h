@@ -10,32 +10,34 @@ namespace sst::waveshapers
  * Set updateInit to false if you are going to wrap this in a dcBlocker (which
  * resets init itself) or other init adjusting function.
  */
-template <void FandADF(__m128, __m128 &, __m128 &), int xR, int aR, bool updateInit = true>
-__m128 ADAA(QuadWaveshaperState *__restrict s, __m128 x)
+template <void FandADF(SIMD_M128, SIMD_M128 &, SIMD_M128 &), int xR, int aR, bool updateInit = true>
+SIMD_M128 ADAA(QuadWaveshaperState *__restrict s, SIMD_M128 x)
 {
     auto xPrior = s->R[xR];
     auto adPrior = s->R[aR];
 
-    __m128 f, ad;
+    SIMD_M128 f, ad;
     FandADF(x, f, ad);
 
-    auto dx = _mm_sub_ps(x, xPrior);
-    auto dad = _mm_sub_ps(ad, adPrior);
+    auto dx = SIMD_MM(sub_ps)(x, xPrior);
+    auto dad = SIMD_MM(sub_ps)(ad, adPrior);
 
     const static auto tolF = 0.0001;
-    const static auto tol = _mm_set1_ps(tolF), ntol = _mm_set1_ps(-tolF);
-    auto ltt = _mm_and_ps(_mm_cmplt_ps(dx, tol), _mm_cmpgt_ps(dx, ntol)); // dx < tol && dx > -tol
-    ltt = _mm_or_ps(ltt, s->init);
-    auto dxDiv = _mm_rcp_ps(_mm_add_ps(_mm_and_ps(ltt, tol), _mm_andnot_ps(ltt, dx)));
+    const static auto tol = SIMD_MM(set1_ps)(tolF), ntol = SIMD_MM(set1_ps)(-tolF);
+    auto ltt = SIMD_MM(and_ps)(SIMD_MM(cmplt_ps)(dx, tol),
+                               SIMD_MM(cmpgt_ps)(dx, ntol)); // dx < tol && dx > -tol
+    ltt = SIMD_MM(or_ps)(ltt, s->init);
+    auto dxDiv =
+        SIMD_MM(rcp_ps)(SIMD_MM(add_ps)(SIMD_MM(and_ps)(ltt, tol), SIMD_MM(andnot_ps)(ltt, dx)));
 
-    auto fFromAD = _mm_mul_ps(dad, dxDiv);
-    auto r = _mm_add_ps(_mm_and_ps(ltt, f), _mm_andnot_ps(ltt, fFromAD));
+    auto fFromAD = SIMD_MM(mul_ps)(dad, dxDiv);
+    auto r = SIMD_MM(add_ps)(SIMD_MM(and_ps)(ltt, f), SIMD_MM(andnot_ps)(ltt, fFromAD));
 
     s->R[xR] = x;
     s->R[aR] = ad;
     if (updateInit)
     {
-        s->init = _mm_setzero_ps();
+        s->init = SIMD_MM(setzero_ps)();
     }
 
     return r;

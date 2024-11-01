@@ -20,6 +20,7 @@ struct TestConfig
 {
     WaveshaperType wsType;
     DataSet expectedData;
+    float margin{1.e-3f};
 };
 
 inline void runTest(const TestConfig &config)
@@ -30,26 +31,26 @@ inline void runTest(const TestConfig &config)
 
     for (int i = 0; i < n_waveshaper_registers; ++i)
     {
-        wsState.R[i] = _mm_set1_ps(R[i]);
+        wsState.R[i] = SIMD_MM(set1_ps)(R[i]);
     }
 
-    wsState.init = _mm_cmpneq_ps(_mm_setzero_ps(), _mm_setzero_ps());
+    wsState.init = SIMD_MM(cmpneq_ps)(SIMD_MM(setzero_ps)(), SIMD_MM(setzero_ps)());
 
     auto wsPtr = GetQuadWaveshaper(config.wsType);
 
     DataSet actualData{};
     for (int i = 0; i < actualData.size(); ++i)
     {
-        auto input = _mm_set1_ps(testInputData[i]);
-        auto drive = _mm_set1_ps(2.0f);
+        auto input = SIMD_MM(set1_ps)(testInputData[i]);
+        auto drive = SIMD_MM(set1_ps)(2.0f);
         auto output = wsPtr(&wsState, input, drive);
 
         float outArr alignas(16)[4];
-        _mm_store_ps(outArr, output);
+        SIMD_MM(store_ps)(outArr, output);
         actualData[i] = outArr[0];
 
         if constexpr (!printData)
-            REQUIRE(actualData[i] == Approx(config.expectedData[i]).margin(1.0e-4f));
+            REQUIRE(actualData[i] == Approx(config.expectedData[i]).margin(config.margin));
     }
 
     if constexpr (printData)

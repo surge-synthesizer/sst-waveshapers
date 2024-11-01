@@ -7,13 +7,13 @@
 
 namespace sst::waveshapers
 {
-template <__m128 (*K)(__m128), bool useDCBlock>
-__m128 CHEBY_CORE(QuadWaveshaperState *__restrict s, __m128 x, __m128 drive)
+template <SIMD_M128 (*K)(SIMD_M128), bool useDCBlock>
+SIMD_M128 CHEBY_CORE(QuadWaveshaperState *__restrict s, SIMD_M128 x, SIMD_M128 drive)
 {
-    const auto m1 = _mm_set1_ps(-1.0f);
-    const auto p1 = _mm_set1_ps(1.0f);
+    const auto m1 = SIMD_MM(set1_ps)(-1.0f);
+    const auto p1 = SIMD_MM(set1_ps)(1.0f);
 
-    auto bound = K(_mm_max_ps(_mm_min_ps(x, p1), m1));
+    auto bound = K(SIMD_MM(max_ps)(SIMD_MM(min_ps)(x, p1), m1));
 
     if (useDCBlock)
     {
@@ -22,44 +22,44 @@ __m128 CHEBY_CORE(QuadWaveshaperState *__restrict s, __m128 x, __m128 drive)
     return TANH(s, bound, drive);
 }
 
-inline __m128 cheb2_kernel(__m128 x) // 2 x^2 - 1
+inline SIMD_M128 cheb2_kernel(SIMD_M128 x) // 2 x^2 - 1
 {
-    const auto m1 = _mm_set1_ps(1);
-    const auto m2 = _mm_set1_ps(2);
-    return _mm_sub_ps(_mm_mul_ps(m2, _mm_mul_ps(x, x)), m1);
+    const auto m1 = SIMD_MM(set1_ps)(1);
+    const auto m2 = SIMD_MM(set1_ps)(2);
+    return SIMD_MM(sub_ps)(SIMD_MM(mul_ps)(m2, SIMD_MM(mul_ps)(x, x)), m1);
 }
 
-inline __m128 cheb3_kernel(__m128 x) // 4 x^3 - 3 x
+inline SIMD_M128 cheb3_kernel(SIMD_M128 x) // 4 x^3 - 3 x
 {
-    const auto m4 = _mm_set1_ps(4);
-    const auto m3 = _mm_set1_ps(3);
-    auto x2 = _mm_mul_ps(x, x);
-    auto v4x2m3 = _mm_sub_ps(_mm_mul_ps(m4, x2), m3);
-    return _mm_mul_ps(v4x2m3, x);
+    const auto m4 = SIMD_MM(set1_ps)(4);
+    const auto m3 = SIMD_MM(set1_ps)(3);
+    auto x2 = SIMD_MM(mul_ps)(x, x);
+    auto v4x2m3 = SIMD_MM(sub_ps)(SIMD_MM(mul_ps)(m4, x2), m3);
+    return SIMD_MM(mul_ps)(v4x2m3, x);
 }
 
-inline __m128 cheb4_kernel(__m128 x) // 8 x^4 - 8 x^2 + 1
+inline SIMD_M128 cheb4_kernel(SIMD_M128 x) // 8 x^4 - 8 x^2 + 1
 {
-    const auto m1 = _mm_set1_ps(1);
-    const auto m8 = _mm_set1_ps(8);
-    auto x2 = _mm_mul_ps(x, x);
-    auto x4mx2 = _mm_mul_ps(x2, _mm_sub_ps(x2, m1)); // x^2 * ( x^2 - 1)
-    return _mm_add_ps(_mm_mul_ps(m8, x4mx2), m1);
+    const auto m1 = SIMD_MM(set1_ps)(1);
+    const auto m8 = SIMD_MM(set1_ps)(8);
+    auto x2 = SIMD_MM(mul_ps)(x, x);
+    auto x4mx2 = SIMD_MM(mul_ps)(x2, SIMD_MM(sub_ps)(x2, m1)); // x^2 * ( x^2 - 1)
+    return SIMD_MM(add_ps)(SIMD_MM(mul_ps)(m8, x4mx2), m1);
 }
 
-inline __m128 cheb5_kernel(__m128 x) // 16 x^5 - 20 x^3 + 5 x
+inline SIMD_M128 cheb5_kernel(SIMD_M128 x) // 16 x^5 - 20 x^3 + 5 x
 {
-    const auto m16 = _mm_set1_ps(16);
-    const auto mn20 = _mm_set1_ps(-20);
-    const auto m5 = _mm_set1_ps(5);
+    const auto m16 = SIMD_MM(set1_ps)(16);
+    const auto mn20 = SIMD_MM(set1_ps)(-20);
+    const auto m5 = SIMD_MM(set1_ps)(5);
 
-    auto x2 = _mm_mul_ps(x, x);
-    auto x3 = _mm_mul_ps(x2, x);
-    auto x5 = _mm_mul_ps(x3, x2);
-    auto t1 = _mm_mul_ps(m16, x5);
-    auto t2 = _mm_mul_ps(mn20, x3);
-    auto t3 = _mm_mul_ps(m5, x);
-    return _mm_add_ps(t1, _mm_add_ps(t2, t3));
+    auto x2 = SIMD_MM(mul_ps)(x, x);
+    auto x3 = SIMD_MM(mul_ps)(x2, x);
+    auto x5 = SIMD_MM(mul_ps)(x3, x2);
+    auto t1 = SIMD_MM(mul_ps)(m16, x5);
+    auto t2 = SIMD_MM(mul_ps)(mn20, x3);
+    auto t3 = SIMD_MM(mul_ps)(m5, x);
+    return SIMD_MM(add_ps)(t1, SIMD_MM(add_ps)(t2, t3));
 }
 
 // Implement sum_n w_i T_i
@@ -70,7 +70,7 @@ template <int len> struct ChebSeries
         auto q = f.begin();
         auto idx = 0;
         for (int i = 0; i < len; ++i)
-            weights[i] = 0.f; // _mm_setzero_ps();
+            weights[i] = 0.f; // SIMD_MM(setzero_ps)();
         while (idx < len && q != f.end())
         {
             weights[idx] = *q;
@@ -79,72 +79,73 @@ template <int len> struct ChebSeries
         }
     }
     float weights[len]{};
-    __m128 eval(__m128 x) const // x bound on 0,1
+    SIMD_M128 eval(SIMD_M128 x) const // x bound on 0,1
     {
-        const auto p2 = _mm_set1_ps(2.0);
-        auto Tm1 = _mm_set1_ps(1.0);
+        const auto p2 = SIMD_MM(set1_ps)(2.0);
+        auto Tm1 = SIMD_MM(set1_ps)(1.0);
         auto Tn = x;
-        auto res = _mm_add_ps(_mm_set1_ps(weights[0]), _mm_mul_ps(_mm_set1_ps(weights[1]), x));
+        auto res = SIMD_MM(add_ps)(SIMD_MM(set1_ps)(weights[0]),
+                                   SIMD_MM(mul_ps)(SIMD_MM(set1_ps)(weights[1]), x));
         for (int idx = 2; idx < len; ++idx)
         {
-            auto nxt = _mm_sub_ps(_mm_mul_ps(_mm_mul_ps(p2, Tn), x), Tm1);
+            auto nxt = SIMD_MM(sub_ps)(SIMD_MM(mul_ps)(SIMD_MM(mul_ps)(p2, Tn), x), Tm1);
             Tm1 = Tn;
             Tn = nxt;
-            res = _mm_add_ps(res, _mm_mul_ps(_mm_set1_ps(weights[idx]), Tn));
+            res = SIMD_MM(add_ps)(res, SIMD_MM(mul_ps)(SIMD_MM(set1_ps)(weights[idx]), Tn));
         }
         return res;
     }
 };
 
-inline __m128 Plus12(QuadWaveshaperState *__restrict s, __m128 in, __m128 drive)
+inline SIMD_M128 Plus12(QuadWaveshaperState *__restrict s, SIMD_M128 in, SIMD_M128 drive)
 {
     static constexpr auto ser = ChebSeries<3>({0, 0.5, 0.5});
-    const auto scale = _mm_set1_ps(0.66);
-    return dcBlock<0, 1>(s, ser.eval(TANH(s, _mm_mul_ps(in, scale), drive)));
+    const auto scale = SIMD_MM(set1_ps)(0.66);
+    return dcBlock<0, 1>(s, ser.eval(TANH(s, SIMD_MM(mul_ps)(in, scale), drive)));
 }
 
-inline __m128 Plus13(QuadWaveshaperState *__restrict s, __m128 in, __m128 drive)
+inline SIMD_M128 Plus13(QuadWaveshaperState *__restrict s, SIMD_M128 in, SIMD_M128 drive)
 {
     static constexpr auto ser = ChebSeries<4>({0, 0.5, 0, 0.5});
-    const auto scale = _mm_set1_ps(0.66);
-    return ser.eval(TANH(s, _mm_mul_ps(in, scale), drive));
+    const auto scale = SIMD_MM(set1_ps)(0.66);
+    return ser.eval(TANH(s, SIMD_MM(mul_ps)(in, scale), drive));
 }
 
-inline __m128 Plus14(QuadWaveshaperState *__restrict s, __m128 in, __m128 drive)
+inline SIMD_M128 Plus14(QuadWaveshaperState *__restrict s, SIMD_M128 in, SIMD_M128 drive)
 {
     static constexpr auto ser = ChebSeries<5>({0, 0.5, 0, 0, 0.5});
-    const auto scale = _mm_set1_ps(0.66);
-    return dcBlock<0, 1>(s, ser.eval(TANH(s, _mm_mul_ps(in, scale), drive)));
+    const auto scale = SIMD_MM(set1_ps)(0.66);
+    return dcBlock<0, 1>(s, ser.eval(TANH(s, SIMD_MM(mul_ps)(in, scale), drive)));
 }
 
-inline __m128 Plus15(QuadWaveshaperState *__restrict s, __m128 in, __m128 drive)
+inline SIMD_M128 Plus15(QuadWaveshaperState *__restrict s, SIMD_M128 in, SIMD_M128 drive)
 {
     static constexpr auto ser = ChebSeries<6>({0, 0.5, 0, 0, 0, 0.5});
-    const auto scale = _mm_set1_ps(0.66);
-    return ser.eval(TANH(s, _mm_mul_ps(in, scale), drive));
+    const auto scale = SIMD_MM(set1_ps)(0.66);
+    return ser.eval(TANH(s, SIMD_MM(mul_ps)(in, scale), drive));
 }
 
-inline __m128 Plus12345(QuadWaveshaperState *__restrict s, __m128 in, __m128 drive)
+inline SIMD_M128 Plus12345(QuadWaveshaperState *__restrict s, SIMD_M128 in, SIMD_M128 drive)
 {
     static constexpr auto ser = ChebSeries<6>({0, 0.2, 0.2, 0.2, 0.2, 0.2});
-    const auto scale = _mm_set1_ps(0.66);
-    return dcBlock<0, 1>(s, ser.eval(TANH(s, _mm_mul_ps(in, scale), drive)));
+    const auto scale = SIMD_MM(set1_ps)(0.66);
+    return dcBlock<0, 1>(s, ser.eval(TANH(s, SIMD_MM(mul_ps)(in, scale), drive)));
 }
 
-inline __m128 PlusSaw3(QuadWaveshaperState *__restrict s, __m128 in, __m128 drive)
+inline SIMD_M128 PlusSaw3(QuadWaveshaperState *__restrict s, SIMD_M128 in, SIMD_M128 drive)
 {
     static constexpr float fac = 0.9f / (1.f + 0.5 + 0.25);
     static constexpr auto ser = ChebSeries<4>({0, -fac, fac * 0.5f, -fac * 0.25f});
-    const auto scale = _mm_set1_ps(-0.66); // flip direction
-    return dcBlock<0, 1>(s, ser.eval(TANH(s, _mm_mul_ps(in, scale), drive)));
+    const auto scale = SIMD_MM(set1_ps)(-0.66); // flip direction
+    return dcBlock<0, 1>(s, ser.eval(TANH(s, SIMD_MM(mul_ps)(in, scale), drive)));
 }
 
-inline __m128 PlusSqr3(QuadWaveshaperState *__restrict s, __m128 in, __m128 drive)
+inline SIMD_M128 PlusSqr3(QuadWaveshaperState *__restrict s, SIMD_M128 in, SIMD_M128 drive)
 {
     static constexpr float fac = 0.9f / (1.f - 0.25 + 1.0 / 16.0);
     static constexpr auto ser = ChebSeries<6>({0, fac, 0, -fac * 0.25f, 0, fac / 16.f});
-    const auto scale = _mm_set1_ps(0.66);
-    return ser.eval(TANH(s, _mm_mul_ps(in, scale), drive));
+    const auto scale = SIMD_MM(set1_ps)(0.66);
+    return ser.eval(TANH(s, SIMD_MM(mul_ps)(in, scale), drive));
 }
 
 } // namespace sst::waveshapers

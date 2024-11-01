@@ -18,8 +18,8 @@ template <int scale> float FuzzTable(const float x)
     return xadj;
 }
 
-template <int scale, __m128 C(QuadWaveshaperState *__restrict, __m128, __m128)>
-__m128 Fuzz(QuadWaveshaperState *__restrict s, __m128 x, __m128 drive)
+template <int scale, SIMD_M128 C(QuadWaveshaperState *__restrict, SIMD_M128, SIMD_M128)>
+SIMD_M128 Fuzz(QuadWaveshaperState *__restrict s, SIMD_M128 x, SIMD_M128 drive)
 {
     static LUTBase<1024, FuzzTable<scale>> table;
     return dcBlock<0, 1>(s, WS_PM1_LUT<1024>(table.data, C(s, x, drive)));

@@ -36,25 +36,27 @@ template <int pts> struct FolderADAA
 
         for (int i = 0; i < pts; ++i)
         {
-            xS[i] = _mm_set1_ps(xs[i]);
-            yS[i] = _mm_set1_ps(ys[i]);
-            mS[i] = _mm_set1_ps(slopes[i]);
-            cS[i] = _mm_set1_ps(intercepts[i]);
+            xS[i] = SIMD_MM(set1_ps)(xs[i]);
+            yS[i] = SIMD_MM(set1_ps)(ys[i]);
+            mS[i] = SIMD_MM(set1_ps)(slopes[i]);
+            cS[i] = SIMD_MM(set1_ps)(intercepts[i]);
         }
     }
 
-    inline void evaluate(__m128 x, __m128 &f, __m128 &adf)
+    inline void evaluate(SIMD_M128 x, SIMD_M128 &f, SIMD_M128 &adf)
     {
-        const auto p05 = _mm_set1_ps(0.5f);
-        __m128 rangeMask[pts - 1], val[pts - 1], adVal[pts - 1];
+        const auto p05 = SIMD_MM(set1_ps)(0.5f);
+        SIMD_M128 rangeMask[pts - 1], val[pts - 1], adVal[pts - 1];
 
         for (int i = 0; i < pts - 1; ++i)
         {
-            rangeMask[i] = _mm_and_ps(_mm_cmpge_ps(x, xS[i]), _mm_cmplt_ps(x, xS[i + 1]));
-            auto ox = _mm_sub_ps(x, xS[i]);
-            val[i] = _mm_add_ps(_mm_mul_ps(mS[i], ox), yS[i]);
-            adVal[i] = _mm_add_ps(_mm_mul_ps(_mm_mul_ps(ox, ox), _mm_mul_ps(mS[i], p05)),
-                                  _mm_add_ps(_mm_mul_ps(yS[i], x), cS[i]));
+            rangeMask[i] =
+                SIMD_MM(and_ps)(SIMD_MM(cmpge_ps)(x, xS[i]), SIMD_MM(cmplt_ps)(x, xS[i + 1]));
+            auto ox = SIMD_MM(sub_ps)(x, xS[i]);
+            val[i] = SIMD_MM(add_ps)(SIMD_MM(mul_ps)(mS[i], ox), yS[i]);
+            adVal[i] = SIMD_MM(add_ps)(
+                SIMD_MM(mul_ps)(SIMD_MM(mul_ps)(ox, ox), SIMD_MM(mul_ps)(mS[i], p05)),
+                SIMD_MM(add_ps)(SIMD_MM(mul_ps)(yS[i], x), cS[i]));
 #if DEBUG_WITH_PRINT
             if (rangeMask[i][0] != 0)
                 std::cout << _D(x[0]) << _D(rangeMask[i][0]) << _D(xS[i][0]) << _D(xS[i + 1][0])
@@ -62,35 +64,35 @@ template <int pts> struct FolderADAA
                           << _D(val[i][0]) << _D(adVal[i][0]) << std::endl;
 #endif
         }
-        auto res = _mm_and_ps(rangeMask[0], val[0]);
-        auto adres = _mm_and_ps(rangeMask[0], adVal[0]);
+        auto res = SIMD_MM(and_ps)(rangeMask[0], val[0]);
+        auto adres = SIMD_MM(and_ps)(rangeMask[0], adVal[0]);
         for (int i = 1; i < pts - 1; ++i)
         {
-            res = _mm_add_ps(res, _mm_and_ps(rangeMask[i], val[i]));
-            adres = _mm_add_ps(adres, _mm_and_ps(rangeMask[i], adVal[i]));
+            res = SIMD_MM(add_ps)(res, SIMD_MM(and_ps)(rangeMask[i], val[i]));
+            adres = SIMD_MM(add_ps)(adres, SIMD_MM(and_ps)(rangeMask[i], adVal[i]));
         }
         f = res;
         adf = adres;
     }
     float xs[pts], ys[pts], dxs[pts], slopes[pts], intercepts[pts];
 
-    __m128 xS[pts], yS[pts], dxS[pts], mS[pts], cS[pts];
+    SIMD_M128 xS[pts], yS[pts], dxS[pts], mS[pts], cS[pts];
 };
 
-inline void singleFoldADAA(__m128 x, __m128 &f, __m128 &adf)
+inline void singleFoldADAA(SIMD_M128 x, SIMD_M128 &f, SIMD_M128 &adf)
 {
     static auto folder = FolderADAA<4>({-10, -0.7, 0.7, 10}, {-1, 1, -1, 1});
     folder.evaluate(x, f, adf);
 }
 
-inline void dualFoldADAA(__m128 x, __m128 &f, __m128 &adf)
+inline void dualFoldADAA(SIMD_M128 x, SIMD_M128 &f, SIMD_M128 &adf)
 {
     static auto folder =
         FolderADAA<8>({-10, -3, -1, -0.3, 0.3, 1, 3, 10}, {-1, -0.9, 1, -1, 1, -1, 0.9, 1});
     folder.evaluate(x, f, adf);
 }
 
-inline void westCoastFoldADAA(__m128 x, __m128 &f, __m128 &adf)
+inline void westCoastFoldADAA(SIMD_M128 x, SIMD_M128 &f, SIMD_M128 &adf)
 {
     // Factors based on
     // DAFx-17 DAFX-194 Virtual Analog Buchla 259 Wavefolder
@@ -105,59 +107,59 @@ inline void westCoastFoldADAA(__m128 x, __m128 &f, __m128 &adf)
     folder.evaluate(x, f, adf);
 }
 
-template <void F(__m128, __m128 &, __m128 &)>
-__m128 WAVEFOLDER(QuadWaveshaperState *__restrict s, __m128 x, __m128 drive)
+template <void F(SIMD_M128, SIMD_M128 &, SIMD_M128 &)>
+SIMD_M128 WAVEFOLDER(QuadWaveshaperState *__restrict s, SIMD_M128 x, SIMD_M128 drive)
 {
-    x = _mm_mul_ps(x, drive);
+    x = SIMD_MM(mul_ps)(x, drive);
     return ADAA<F, 0, 1>(s, x);
 }
 
-inline __m128 SoftOneFold(QuadWaveshaperState *__restrict, __m128 x, __m128 drive)
+inline SIMD_M128 SoftOneFold(QuadWaveshaperState *__restrict, SIMD_M128 x, SIMD_M128 drive)
 {
     // x / (0.4 + 0.7 x^2)
-    auto y = _mm_mul_ps(x, drive);
-    auto y2 = _mm_mul_ps(y, y);
+    auto y = SIMD_MM(mul_ps)(x, drive);
+    auto y2 = SIMD_MM(mul_ps)(y, y);
 
-    const auto p04 = _mm_set1_ps(0.4f);
-    const auto p07 = _mm_set1_ps(0.7f);
+    const auto p04 = SIMD_MM(set1_ps)(0.4f);
+    const auto p07 = SIMD_MM(set1_ps)(0.7f);
 
-    auto num = _mm_add_ps(p04, _mm_mul_ps(p07, y2));
+    auto num = SIMD_MM(add_ps)(p04, SIMD_MM(mul_ps)(p07, y2));
 
-    return _mm_mul_ps(y, _mm_rcp_ps(num));
+    return SIMD_MM(mul_ps)(y, SIMD_MM(rcp_ps)(num));
 }
 
-inline __m128 LINFOLD_SSE2(QuadWaveshaperState *__restrict s, __m128 in, __m128 drive)
+inline SIMD_M128 LINFOLD_SSE2(QuadWaveshaperState *__restrict s, SIMD_M128 in, SIMD_M128 drive)
 {
     // The following code is heavily derived from Vital's linear fold (GPLv3, compatible with SST)
     // I think there might be some optimizations to be done here, but I haven't messed with it yet
     // Lots of constants, yikes
-    const __m128 mfour = _mm_set1_ps(-4.f);
-    const __m128 two = _mm_set1_ps(2.f);
-    const __m128 one = _mm_set1_ps(1.f);
-    const __m128 p75 = _mm_set1_ps(0.75f);
-    const __m128 p25 = _mm_set1_ps(0.25f);
-    const __m128 zero = _mm_set1_ps(0.f);
+    const auto mfour = SIMD_MM(set1_ps)(-4.f);
+    const auto two = SIMD_MM(set1_ps)(2.f);
+    const auto one = SIMD_MM(set1_ps)(1.f);
+    const auto p75 = SIMD_MM(set1_ps)(0.75f);
+    const auto p25 = SIMD_MM(set1_ps)(0.25f);
+    const auto zero = SIMD_MM(set1_ps)(0.f);
 
-    __m128 x = _mm_mul_ps(in, drive);
+    auto x = SIMD_MM(mul_ps)(in, drive);
     // Prescale the input value
-    x = _mm_mul_ps(x, p25);
-    x = _mm_add_ps(x, p75);
+    x = SIMD_MM(mul_ps)(x, p25);
+    x = SIMD_MM(add_ps)(x, p75);
 
     // Now, perform a modulus by 1
-    __m128i e = _mm_cvtps_epi32(x);
-    __m128 a = _mm_sub_ps(x, _mm_cvtepi32_ps(e));
-    a = _mm_add_ps(a, _mm_and_ps(one, _mm_cmplt_ps(a, zero)));
+    SIMD_M128I e = SIMD_MM(cvtps_epi32)(x);
+    auto a = SIMD_MM(sub_ps)(x, SIMD_MM(cvtepi32_ps)(e));
+    a = SIMD_MM(add_ps)(a, SIMD_MM(and_ps)(one, SIMD_MM(cmplt_ps)(a, zero)));
 
     // Finally, scale the output value
-    a = _mm_mul_ps(a, mfour);
-    a = _mm_add_ps(a, two);
+    a = SIMD_MM(mul_ps)(a, mfour);
+    a = SIMD_MM(add_ps)(a, two);
 
     // Absolute value
     uint32_t v = 0x7fffffff; // Trick C++ into initializing a float mask that clears the sign bit
-    a = _mm_and_ps(a, _mm_set1_ps(*((float *)&v)));
+    a = SIMD_MM(and_ps)(a, SIMD_MM(set1_ps)(*((float *)&v)));
 
     // Now finish up by shifting down a bit...
-    a = _mm_sub_ps(a, one);
+    a = SIMD_MM(sub_ps)(a, one);
 
     return a;
 }
