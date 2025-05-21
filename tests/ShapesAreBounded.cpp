@@ -14,7 +14,6 @@
 
 #include "TestUtils.h"
 #include <iostream>
-#include <print>
 #include "sst/basic-blocks/simd/setup.h"
 #include "sst/waveshapers.h"
 #include <cmath>
