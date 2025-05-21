@@ -15,6 +15,9 @@
 
 TEST_CASE("Fuzzes Test")
 {
+#if SKIP_FUZZES
+    REQUIRE(true);
+#else
     SECTION("FUZZ")
     {
         TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_fuzz,
@@ -52,4 +55,5 @@ TEST_CASE("Fuzzes Test")
              {0.0f, 0.167961f, 0.65832f, 1.00573f, 0.395507f, -0.0849603f, -0.75362f, -0.826739f},
              5e-2});
     }
+#endif
 }

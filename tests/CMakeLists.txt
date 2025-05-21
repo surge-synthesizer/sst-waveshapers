@@ -15,6 +15,11 @@ target_sources(sst-waveshapers-tests
         tests.cpp
 )
 
+# MSVC has a different rng
+if (WIN32)
+    target_compile_definitions(sst-waveshapers-tests PRIVATE SKIP_FUZZES=1)
+endif()
+
 add_custom_command(TARGET sst-waveshapers-tests
         POST_BUILD
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
