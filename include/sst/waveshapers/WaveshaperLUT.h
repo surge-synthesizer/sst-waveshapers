@@ -118,15 +118,21 @@ template <int NP, float F(const float)> struct LUTBase
     }
 };
 
+template <float F(float), int N> inline float *LutTableData()
+{
+    static LUTBase<N, F> table;
+    return table.data;
+}
+
 template <float F(float), int N, SIMD_M128 C(QuadWaveshaperState *__restrict, SIMD_M128, SIMD_M128),
           bool block = true>
 SIMD_M128 TableEval(QuadWaveshaperState *__restrict s, SIMD_M128 x, SIMD_M128 drive)
 {
-    static LUTBase<N, F> table;
+    auto data = LutTableData<F, N>();
     if (block)
-        return dcBlock<0, 1>(s, WS_PM1_LUT<N>(table.data, C(s, x, drive)));
+        return dcBlock<0, 1>(s, WS_PM1_LUT<N>(data, C(s, x, drive)));
     else
-        return WS_PM1_LUT<N>(table.data, C(s, x, drive));
+        return WS_PM1_LUT<N>(data, C(s, x, drive));
 }
 } // namespace sst::waveshapers
 

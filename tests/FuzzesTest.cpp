@@ -20,39 +20,39 @@ TEST_CASE("Fuzzes Test")
 #else
     SECTION("FUZZ")
     {
-        TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_fuzz,
-                            {0.0113002f, 0.231677f, 0.939218f, 0.939124f, 0.369194f, -0.105554f,
-                             -0.990744f, -0.990645f}});
+        TestUtils::runTest(
+            {sst::waveshapers::WaveshaperType::wst_fuzz,
+             {0.f, 0.220378f, 0.92792f, 0.927827f, 0.357899f, -0.116849f, -1.00204f, -1.00194f}});
     }
 
     SECTION("HEAVY FUZZ")
     {
-        TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_fuzzheavy,
-                            {0.0339005f, 0.295032f, 0.817694f, 0.817612f, 0.108023f, -0.116123f,
-                             -0.971712f, -0.971614f}});
+        TestUtils::runTest(
+            {sst::waveshapers::WaveshaperType::wst_fuzzheavy,
+             {0.f, 0.261135f, 0.7838f, 0.783722f, 0.0741361f, -0.150006f, -1.00559f, -1.00549f}});
     }
 
     SECTION("FUZZ CENTER")
     {
-        TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_fuzzctr,
-                            {0.392422f, 0.137087f, 0.777535f, 0.983756f, 0.465164f, 0.163438f,
-                             -0.81944f, -0.984097f},
-                            5e-2});
+        TestUtils::runTest(
+            {sst::waveshapers::WaveshaperType::wst_fuzzctr,
+             {0.f, -0.241235f, 0.385376f, 0.591691f, 0.0723392f, -0.231693f, -1.21146f, -1.37649f},
+             5e-2});
     }
 
     SECTION("FUZZ SOFT CLIP")
     {
-        TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_fuzzsoft,
-                            {-0.0498637f, 0.176861f, 0.769438f, 0.882686f, 0.411067f, -0.0660712f,
-                             -0.874844f, -0.924149f},
-                            5e-2});
+        TestUtils::runTest(
+            {sst::waveshapers::WaveshaperType::wst_fuzzsoft,
+             {0.f, 0.211718f, 0.763057f, 0.803661f, 0.425659f, -0.117334f, -0.623519f, -0.944568f},
+             5e-2});
     }
 
     SECTION("FUZZ SOFT EDGE")
     {
         TestUtils::runTest(
             {sst::waveshapers::WaveshaperType::wst_fuzzsoftedge,
-             {0.0f, 0.167961f, 0.65832f, 1.00573f, 0.395507f, -0.0849603f, -0.75362f, -0.826739f},
+             {0.f, 0.16799f, 0.6643f, 0.978468f, 0.395231f, -0.0849648f, -0.748686f, -0.838533f},
              5e-2});
     }
 #endif

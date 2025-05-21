@@ -18,22 +18,30 @@ TEST_CASE("Harmonics Test")
     SECTION("Soft Harmonic 2")
     {
         TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_cheby2,
-                            {-0.983887f, -0.981756f, -0.777578f, 0.983957f, -0.964114f, -0.983526f,
-                             -0.668806f, 0.984113f}});
+                            {
+                                0.f,
+                                0.039981f,
+                                0.777773f,
+                                1.f,
+                                0.244986f,
+                                0.00947075f,
+                                0.85708f,
+                                1.f,
+                            }});
     }
 
     SECTION("Soft Harmonic 3")
     {
         TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_cheby3,
-                            {0.0f, -0.53699f, -0.984323f, 0.984047f, -0.902664f, 0.291438f,
-                             0.98229f, -0.983905f}});
+                            {0.f, -0.536956f, -0.984123f, 0.984142f, -0.902497f, 0.29149f,
+                             0.982302f, -0.984129f}});
     }
 
     SECTION("Soft Harmonic 4")
     {
         TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_cheby4,
-                            {0.983887f, 0.972811f, -0.777908f, 0.984184f, 0.80417f, 0.981804f,
-                             -0.902898f, 0.984195f}});
+                            {0.f, -0.157232f, -0.999996f, 0.000315666f, -0.748524f, -0.0394723f,
+                             -1.f, 0.000751017f}});
     }
 
     SECTION("Soft Harmonic 5")
@@ -46,8 +54,8 @@ TEST_CASE("Harmonics Test")
     SECTION("Additive 1+2")
     {
         TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_add12,
-                            {-0.5f, -0.417053f, 0.135844f, 0.734737f, -0.237945f, -0.528582f,
-                             -0.418359f, -0.154147f}});
+                            {0.f, 0.0829067f, 0.635747f, 1.23454f, 0.261891f, -0.0288343f,
+                             0.0813495f, 0.345475f}});
     }
 
     SECTION("Additive 1+3")
@@ -60,8 +68,8 @@ TEST_CASE("Harmonics Test")
     SECTION("Additive 1+4")
     {
         TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_add14,
-                            {0.5f, 0.497825f, -0.108627f, 0.281226f, 0.292698f, 0.449599f,
-                             -0.771982f, -0.607728f}});
+                            {0.f, -0.0021314f, -0.608528f, -0.218725f, -0.207151f, -0.0501574f,
+                             -1.2717f, -1.10746f}});
     }
 
     SECTION("Additive 1+5")
@@ -81,8 +89,8 @@ TEST_CASE("Harmonics Test")
     SECTION("Additive Saw 3")
     {
         TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_addsaw3,
-                            {-0.257143f, -0.230203f, 0.0978563f, 0.62482f, -0.146698f, -0.263539f,
-                             -0.262559f, -0.326252f}});
+                            {1.49012e-07f, 0.0269183f, 0.35495f, 0.881837f, 0.110362f, -0.00652488f,
+                             -0.00557171f, -0.0692796f}});
     }
 
     SECTION("Additive Square 3")

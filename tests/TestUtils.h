@@ -38,6 +38,9 @@ struct TestConfig
 
 inline void runTest(const TestConfig &config)
 {
+    if (printData)
+        std::cout << sst::waveshapers::wst_names[(int)config.wsType] << std::endl;
+
     QuadWaveshaperState wsState;
     float R[n_waveshaper_registers];
     initializeWaveshaperRegister(config.wsType, R);
@@ -64,6 +67,8 @@ inline void runTest(const TestConfig &config)
 
         if constexpr (!printData)
             REQUIRE(actualData[i] == Approx(config.expectedData[i]).margin(config.margin));
+        else if (actualData[i] != Approx(config.expectedData[i]).margin(config.margin))
+            std::cout << "Mismatch at index " << i << std::endl;
     }
 
     if constexpr (printData)
