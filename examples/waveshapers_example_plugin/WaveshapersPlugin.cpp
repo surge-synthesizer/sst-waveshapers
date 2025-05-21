@@ -1,5 +1,18 @@
+/*
+ * sst-waveshaper - an open source library of waveshaper algorithms
+ * by the Surge Synth Team
+ *
+ * Copyright 2018-2025, various authors, as described in the GitHub
+ * transaction log.
+ *
+ * sst-jucegui is released under the GNU General Public License 3 or later
+ * as found in LICENSE.md in this repository.
+ *
+ * All source in sst-waveshapers available at
+ * https://github.com/surge-synthesizer/sst-waveshapers
+ */
 #include "WaveshapersPlugin.h"
-//#include "FiltersPluginEditor.h"
+// #include "FiltersPluginEditor.h"
 
 WaveshapersPlugin::WaveshapersPlugin()
     : juce::AudioProcessor(BusesProperties()
@@ -52,16 +65,17 @@ bool WaveshapersPlugin::isBusesLayoutSupported(
 void WaveshapersPlugin::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     const auto numChannels = getTotalNumInputChannels();
-    oversampling = std::make_unique<juce::dsp::Oversampling<float>>(numChannels, 1, juce::dsp::Oversampling<float>::filterHalfBandPolyphaseIIR);
+    oversampling = std::make_unique<juce::dsp::Oversampling<float>>(
+        numChannels, 1, juce::dsp::Oversampling<float>::filterHalfBandPolyphaseIIR);
     oversampling->initProcessing(samplesPerBlock);
 
-    driveSmoothed.reset(sampleRate * (double) oversampling->getOversamplingFactor(), 0.05);
+    driveSmoothed.reset(sampleRate * (double)oversampling->getOversamplingFactor(), 0.05);
 }
 
 void WaveshapersPlugin::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &)
 {
     // set up waveshaper
-    const auto newType = static_cast<sst::waveshapers::WaveshaperType> ((int) *waveshaperTypeParam);
+    const auto newType = static_cast<sst::waveshapers::WaveshaperType>((int)*waveshaperTypeParam);
     if (newType != lastType)
     {
         lastType = newType;
@@ -74,19 +88,19 @@ void WaveshapersPlugin::processBlock(juce::AudioBuffer<float> &buffer, juce::Mid
             wss.R[i] = _mm_set1_ps(R[i]);
         }
 
-        wss.init = _mm_cmpneq_ps(_mm_setzero_ps(), _mm_setzero_ps());
+        wss.init = _mm_cmpeq_ps(_mm_setzero_ps(), _mm_setzero_ps());
     }
 
     driveSmoothed.setTargetValue(juce::Decibels::decibelsToGain(driveParam->load()));
     auto wsptr = sst::waveshapers::GetQuadWaveshaper(lastType);
 
     // now upsample
-    auto&& block = juce::dsp::AudioBlock<float> {buffer};
-    auto&& osBlock = oversampling->processSamplesUp(block);
+    auto &&block = juce::dsp::AudioBlock<float>{buffer};
+    auto &&osBlock = oversampling->processSamplesUp(block);
 
     const auto osNumChannels = osBlock.getNumChannels();
-    auto* leftData = osBlock.getChannelPointer(0);
-    auto* rightData = osBlock.getChannelPointer(1 % osNumChannels);
+    auto *leftData = osBlock.getChannelPointer(0);
+    auto *rightData = osBlock.getChannelPointer(1 % osNumChannels);
 
     const auto osNumSamples = (int)osBlock.getNumSamples();
 
