@@ -47,7 +47,7 @@ inline void runTest(const TestConfig &config)
         wsState.R[i] = SIMD_MM(set1_ps)(R[i]);
     }
 
-    wsState.init = SIMD_MM(cmpneq_ps)(SIMD_MM(setzero_ps)(), SIMD_MM(setzero_ps)());
+    wsState.init = SIMD_MM(cmpeq_ps)(SIMD_MM(setzero_ps)(), SIMD_MM(setzero_ps)());
 
     auto wsPtr = GetQuadWaveshaper(config.wsType);
 
