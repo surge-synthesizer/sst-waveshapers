@@ -53,10 +53,10 @@ TEST_CASE("All Items are Bounded on Change")
             initializeWaveshaperRegister(wstype, R);
             for (int i = 0; i < sst::waveshapers::n_waveshaper_registers; ++i)
             {
-                wss.R[i] = _mm_set1_ps(R[i]);
+                wss.R[i] = SIMD_MM(set1_ps)(R[i]);
             }
 
-            wss.init = _mm_cmpeq_ps(_mm_setzero_ps(), _mm_setzero_ps());
+            wss.init = SIMD_MM(cmpeq_ps)(SIMD_MM(setzero_ps()), SIMD_MM(setzero_ps()));
             wsptr = sst::waveshapers::GetQuadWaveshaper(wstype);
         }
         if (!wsptr)
@@ -65,8 +65,8 @@ TEST_CASE("All Items are Bounded on Change")
         float din alignas(16)[4] = {0, 0, 0, 0};
         din[0] = insig;
         din[1] = insig;
-        auto dat = _mm_load_ps(din);
-        auto drv = _mm_set1_ps(0.25);
+        auto dat = SIMD_MM(load_ps)(din);
+        auto drv = SIMD_MM(set1_ps)(0.25);
 
         int shindex = shapertypes[curtypeindex];
         auto wstype = sst::waveshapers::WaveshaperType(shindex);
@@ -75,7 +75,7 @@ TEST_CASE("All Items are Bounded on Change")
 
         float res alignas(16)[4];
 
-        _mm_store_ps(res, dat);
+        SIMD_MM(store_ps)(res, dat);
 
         if (res[0] < -2.0 || res[0] > 2.0 || std::isnan(res[0]) || std::isinf(res[0]) ||
             res[1] < -2.0 || res[1] > 2.0 || std::isnan(res[1]) || std::isinf(res[1]))
