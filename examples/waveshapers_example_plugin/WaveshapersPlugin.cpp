@@ -88,7 +88,7 @@ void WaveshapersPlugin::processBlock(juce::AudioBuffer<float> &buffer, juce::Mid
             wss.R[i] = _mm_set1_ps(R[i]);
         }
 
-        wss.init = _mm_cmpneq_ps(_mm_setzero_ps(), _mm_setzero_ps());
+        wss.init = _mm_cmpeq_ps(_mm_setzero_ps(), _mm_setzero_ps());
     }
 
     driveSmoothed.setTargetValue(juce::Decibels::decibelsToGain(driveParam->load()));
