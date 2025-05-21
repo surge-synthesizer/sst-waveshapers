@@ -23,7 +23,11 @@ namespace sst::waveshapers
 {
 template <int scale> float FuzzTable(const float x)
 {
-    static auto gen = std::minstd_rand(2112);
+    // What the heck is this? Well this is the macOS and Linux definitision
+    // of std::minstd_rand, and we de-typedef it here to make the fuzzes the
+    // same on all platforms and compiler choices, since the spec gives
+    // leeway as to what to choose
+    static auto gen = std::linear_congruential_engine<uint_fast32_t, 48271, 0, 2147483647>(2112);
     const float range = 0.1 * scale;
     static auto dist = std::uniform_real_distribution<float>(-range, range);
 
