@@ -11,6 +11,7 @@ target_sources(sst-waveshapers-tests
         WavefoldersTest.cpp
         FuzzesTest.cpp
         TrigonometricsTest.cpp
+        ShapesAreBounded.cpp
         tests.cpp
 )
 
