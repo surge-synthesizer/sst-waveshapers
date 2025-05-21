@@ -11,8 +11,8 @@
  * All source in sst-waveshapers available at
  * https://github.com/surge-synthesizer/sst-waveshapers
  */
-#ifndef SST_WAVESHAPER_SST_UTILITIES_GLOBALS_H
-#define SST_WAVESHAPER_SST_UTILITIES_GLOBALS_H
+#ifndef WS_INCLUDE_SST_UTILITIES_GLOBALS_H
+#define WS_INCLUDE_SST_UTILITIES_GLOBALS_H
 
 #include <math.h>
 #include <stdio.h>

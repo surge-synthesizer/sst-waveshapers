@@ -11,8 +11,8 @@
  * All source in sst-waveshapers available at
  * https://github.com/surge-synthesizer/sst-waveshapers
  */
-#ifndef SST_WAVESHAPER_SST_WAVESHAPERS_HARMONICS_H
-#define SST_WAVESHAPER_SST_WAVESHAPERS_HARMONICS_H
+#ifndef WS_INCLUDE_SST_WAVESHAPERS_HARMONICS_H
+#define WS_INCLUDE_SST_WAVESHAPERS_HARMONICS_H
 
 #include "QuadWaveshaper.h"
 #include "Saturators.h"

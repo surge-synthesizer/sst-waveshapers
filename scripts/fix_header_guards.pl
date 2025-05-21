@@ -23,7 +23,7 @@ sub findfiles
         $hg =~ s:/:_:g;
         $hg =~ s:\.:_:g;
         $hg =~ s:-:_:g;
-        $hg =~ s:include:sst_waveshaper:;
+        $hg =~ s:include:ws_include:;
         $hg = uc($hg);
         print "$f -> $hg\n";
 

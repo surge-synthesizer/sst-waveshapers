@@ -11,8 +11,8 @@
  * All source in sst-waveshapers available at
  * https://github.com/surge-synthesizer/sst-waveshapers
  */
-#ifndef SST_WAVESHAPER_SST_WAVESHAPERS_FUZZES_H
-#define SST_WAVESHAPER_SST_WAVESHAPERS_FUZZES_H
+#ifndef WS_INCLUDE_SST_WAVESHAPERS_FUZZES_H
+#define WS_INCLUDE_SST_WAVESHAPERS_FUZZES_H
 
 #include <random>
 

@@ -11,11 +11,11 @@
  * All source in sst-waveshapers available at
  * https://github.com/surge-synthesizer/sst-waveshapers
  */
-#ifndef SST_WAVESHAPER_SST_WAVESHAPERS_QUADWAVESHAPER_H
-#define SST_WAVESHAPER_SST_WAVESHAPERS_QUADWAVESHAPER_H
+#ifndef WS_INCLUDE_SST_WAVESHAPERS_QUADWAVESHAPER_H
+#define WS_INCLUDE_SST_WAVESHAPERS_QUADWAVESHAPER_H
 
 #ifndef SST_WAVESHAPER_SST_WAVESHAPERS_QUADWAVESHAPER_H
-#define SST_WAVESHAPER_SST_WAVESHAPERS_QUADWAVESHAPER_H
+#define WS_INCLUDE_SST_WAVESHAPERS_QUADWAVESHAPER_H
 
 #include "sst/utilities/globals.h"
 #include "WaveshaperConfiguration.h"
