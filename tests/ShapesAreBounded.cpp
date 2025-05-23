@@ -71,6 +71,10 @@ TEST_CASE("All Items are Bounded on Change")
         int shindex = shapertypes[curtypeindex];
         auto wstype = sst::waveshapers::WaveshaperType(shindex);
 
+        if (ssc == 253 && wstype == sst::waveshapers::WaveshaperType::wst_fuzzctr)
+        {
+            std::cout << "Here";
+        }
         dat = wsptr(&wss, dat, drv);
 
         float res alignas(16)[4];
@@ -80,7 +84,9 @@ TEST_CASE("All Items are Bounded on Change")
         if (res[0] < -2.0 || res[0] > 2.0 || std::isnan(res[0]) || std::isinf(res[0]) ||
             res[1] < -2.0 || res[1] > 2.0 || std::isnan(res[1]) || std::isinf(res[1]))
         {
-            INFO("Bad sample produced by waveshaper at " << ssc << " " << res[0] << " " << res[1]);
+            INFO(sst::waveshapers::wst_names[shindex] << " Bad sample produced by waveshaper at "
+                                                      << ssc << " " << din[0] << "->" << res[0]
+                                                      << " " << res[1]);
             REQUIRE(false);
         }
         ssc++;

@@ -35,8 +35,8 @@ TEST_CASE("Rectifiers Test")
 
     SECTION("SOFT RECTIFIER")
     {
-        TestUtils::runTest({sst::waveshapers::WaveshaperType::wst_softrect,
-                            {-0.983887f, -0.969348f, -0.674638f, 0.777768f, 0.465924f, -0.940015f,
-                             -0.674389f, 0.819212f}});
+        TestUtils::runTest(
+            {sst::waveshapers::WaveshaperType::wst_softrect,
+             {0.f, 0.19766f, 0.854048f, 0.999996f, 0.998494f, 0.41006f, 0.853818f, 1.f}});
     }
 }
