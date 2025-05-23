@@ -24,7 +24,11 @@ template <int R1, int R2> inline SIMD_M128 dcBlock(QuadWaveshaperState *__restri
     // y_n = x_n - x_n-1 + R y_n-1
     const auto fac = SIMD_MM(set1_ps)(0.9999);
     auto dx = SIMD_MM(sub_ps)(x, s->R[R1]);
+    dx = SIMD_MM(add_ps)(SIMD_MM(and_ps)(s->init, SIMD_MM(setzero_ps)()),
+                         SIMD_MM(andnot_ps)(s->init, dx));
+
     auto filtval = SIMD_MM(add_ps)(dx, SIMD_MM(mul_ps)(fac, s->R[R2]));
+
     s->R[R1] = x;
     s->R[R2] = filtval;
     s->init = SIMD_MM(setzero_ps)();

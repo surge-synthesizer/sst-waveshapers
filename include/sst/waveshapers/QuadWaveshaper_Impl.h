@@ -148,7 +148,7 @@ inline void initializeWaveshaperRegister(WaveshaperType type, float R[n_waveshap
 {
     for (int i = 0; i < n_waveshaper_registers; ++i)
         R[i] = 0.f;
-
+#if 0
     // These are basically setting up the DC blcker so the value of 'prior observation'
     // is what the DC blocker is fed at zero
     switch (type)
@@ -171,31 +171,10 @@ inline void initializeWaveshaperRegister(WaveshaperType type, float R[n_waveshap
     case WaveshaperType::wst_cheby4:
         R[0] = 1;
         break;
-    case WaveshaperType::wst_fuzz:
-    case WaveshaperType::wst_fuzzsoft:
-    {
-        auto dat = LutTableData<FuzzTable<1>, 1024>();
-        auto ctr = dat[512];
-        R[0] = ctr;
-    }
-    break;
-    case WaveshaperType::wst_fuzzheavy:
-    {
-        auto dat = LutTableData<FuzzTable<3>, 1024>();
-        auto ctr = dat[512];
-        R[0] = ctr;
-    }
-    break;
-    case WaveshaperType::wst_fuzzctr:
-    {
-        auto dat = LutTableData<FuzzCtrTable, 2048>();
-        auto ctr = dat[1024];
-        R[0] = ctr;
-    }
-    break;
     default:
         break;
     }
+#endif
 }
 } // namespace sst::waveshapers
 

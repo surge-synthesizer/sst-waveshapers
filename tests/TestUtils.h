@@ -16,6 +16,7 @@
 
 #include <array>
 #include <iostream>
+#include <iomanip>
 
 #include <catch2/catch2.hpp>
 #include <sst/waveshapers.h>
@@ -74,8 +75,12 @@ inline void runTest(const TestConfig &config)
     if constexpr (printData)
     {
         std::cout << "{ ";
+        std::string prefix = "";
         for (int i = 0; i < actualData.size(); ++i)
-            std::cout << actualData[i] << "f, ";
+        {
+            std::cout << prefix << std::fixed << std::setprecision(8) << actualData[i] << "f";
+            prefix = ", ";
+        }
 
         std::cout << "}" << std::endl;
     }

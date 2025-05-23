@@ -79,21 +79,30 @@ template <int N> SIMD_M128 WS_PM1_LUT(const float *table, SIMD_M128 in)
     auto e = SIMD_MM(cvtps_epi32)(SIMD_MM(max_ps)(SIMD_MM(min_ps)(x, UB), zero));
     auto a = SIMD_MM(cvtepi32_ps)(e);
     auto frac = SIMD_MM(sub_ps)(x, a);
+    auto fracneg = SIMD_MM(cmplt_ps)(frac, zero);
+    frac = SIMD_MM(add_ps)(frac, SIMD_MM(and_ps)(fracneg, one));
+
+    assert(frac[0] >= 0);
+    assert(frac[0] <= 1);
     e = SIMD_MM(packs_epi32)(e, e);
 
     // on PC write to memory & back as XMM -> GPR is slow on K8
     short e4 alignas(16)[8];
     SIMD_MM(store_si128)((SIMD_M128I *)&e4, e);
 
-    auto ws1 = SIMD_MM(load_ss)(&table[e4[0]]);
-    auto ws2 = SIMD_MM(load_ss)(&table[e4[1]]);
-    auto ws3 = SIMD_MM(load_ss)(&table[e4[2]]);
-    auto ws4 = SIMD_MM(load_ss)(&table[e4[3]]);
+    float offf alignas(16)[4];
+    SIMD_MM(store_ps)(offf, SIMD_MM(and_ps)(fracneg, one));
+    int off[4]{(int)offf[0], (int)offf[1], (int)offf[2], (int)offf[3]};
+
+    auto ws1 = SIMD_MM(load_ss)(&table[e4[0] - off[0]]);
+    auto ws2 = SIMD_MM(load_ss)(&table[e4[1] - off[1]]);
+    auto ws3 = SIMD_MM(load_ss)(&table[e4[2] - off[2]]);
+    auto ws4 = SIMD_MM(load_ss)(&table[e4[3] - off[3]]);
     auto ws = SIMD_MM(movelh_ps)(SIMD_MM(unpacklo_ps)(ws1, ws2), SIMD_MM(unpacklo_ps)(ws3, ws4));
-    ws1 = SIMD_MM(load_ss)(&table[(e4[0] + 1)]);
-    ws2 = SIMD_MM(load_ss)(&table[(e4[1] + 1)]);
-    ws3 = SIMD_MM(load_ss)(&table[(e4[2] + 1)]);
-    ws4 = SIMD_MM(load_ss)(&table[(e4[3] + 1)]);
+    ws1 = SIMD_MM(load_ss)(&table[(e4[0] + 1 - off[0])]);
+    ws2 = SIMD_MM(load_ss)(&table[(e4[1] + 1 - off[1])]);
+    ws3 = SIMD_MM(load_ss)(&table[(e4[2] + 1 - off[2])]);
+    ws4 = SIMD_MM(load_ss)(&table[(e4[3] + 1 - off[3])]);
     auto wsn = SIMD_MM(movelh_ps)(SIMD_MM(unpacklo_ps)(ws1, ws2), SIMD_MM(unpacklo_ps)(ws3, ws4));
 
     auto res = SIMD_MM(add_ps)(SIMD_MM(mul_ps)(SIMD_MM(sub_ps)(one, frac), ws),
@@ -118,21 +127,15 @@ template <int NP, float F(const float)> struct LUTBase
     }
 };
 
-template <float F(float), int N> inline float *LutTableData()
-{
-    static LUTBase<N, F> table;
-    return table.data;
-}
-
 template <float F(float), int N, SIMD_M128 C(QuadWaveshaperState *__restrict, SIMD_M128, SIMD_M128),
           bool block = true>
 SIMD_M128 TableEval(QuadWaveshaperState *__restrict s, SIMD_M128 x, SIMD_M128 drive)
 {
-    auto data = LutTableData<F, N>();
+    static LUTBase<N, F> table;
     if (block)
-        return dcBlock<0, 1>(s, WS_PM1_LUT<N>(data, C(s, x, drive)));
+        return dcBlock<0, 1>(s, WS_PM1_LUT<N>(table.data, C(s, x, drive)));
     else
-        return WS_PM1_LUT<N>(data, C(s, x, drive));
+        return WS_PM1_LUT<N>(table.data, C(s, x, drive));
 }
 } // namespace sst::waveshapers
 
