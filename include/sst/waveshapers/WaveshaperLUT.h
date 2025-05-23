@@ -82,8 +82,6 @@ template <int N> SIMD_M128 WS_PM1_LUT(const float *table, SIMD_M128 in)
     auto fracneg = SIMD_MM(cmplt_ps)(frac, zero);
     frac = SIMD_MM(add_ps)(frac, SIMD_MM(and_ps)(fracneg, one));
 
-    assert(frac[0] >= 0);
-    assert(frac[0] <= 1);
     e = SIMD_MM(packs_epi32)(e, e);
 
     // on PC write to memory & back as XMM -> GPR is slow on K8
