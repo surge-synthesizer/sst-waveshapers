@@ -18,7 +18,8 @@
 
 namespace sst::waveshapers
 {
-template <int R1, int R2> inline SIMD_M128 dcBlock(QuadWaveshaperState *__restrict s, SIMD_M128 x)
+template <int R1, int R2, bool updateInit = true>
+inline SIMD_M128 dcBlock(QuadWaveshaperState *__restrict s, SIMD_M128 x)
 {
     // https://www.dsprelated.com/freebooks/filters/DC_Blocker.html
     // y_n = x_n - x_n-1 + R y_n-1
@@ -31,7 +32,10 @@ template <int R1, int R2> inline SIMD_M128 dcBlock(QuadWaveshaperState *__restri
 
     s->R[R1] = x;
     s->R[R2] = filtval;
-    s->init = SIMD_MM(setzero_ps)();
+    if (updateInit)
+    {
+        s->init = SIMD_MM(setzero_ps)();
+    }
     return filtval;
 }
 } // namespace sst::waveshapers
