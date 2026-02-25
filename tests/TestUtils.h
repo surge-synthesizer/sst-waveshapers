@@ -16,7 +16,6 @@
 
 #include <array>
 #include <iostream>
-#include <iomanip>
 
 #include <catch2/catch2.hpp>
 #include <sst/waveshapers.h>
@@ -39,9 +38,6 @@ struct TestConfig
 
 inline void runTest(const TestConfig &config)
 {
-    if (printData)
-        std::cout << sst::waveshapers::wst_names[(int)config.wsType] << std::endl;
-
     QuadWaveshaperState wsState;
     float R[n_waveshaper_registers];
     initializeWaveshaperRegister(config.wsType, R);
@@ -68,19 +64,13 @@ inline void runTest(const TestConfig &config)
 
         if constexpr (!printData)
             REQUIRE(actualData[i] == Approx(config.expectedData[i]).margin(config.margin));
-        else if (actualData[i] != Approx(config.expectedData[i]).margin(config.margin))
-            std::cout << "Mismatch at index " << i << std::endl;
     }
 
     if constexpr (printData)
     {
         std::cout << "{ ";
-        std::string prefix = "";
         for (int i = 0; i < actualData.size(); ++i)
-        {
-            std::cout << prefix << std::fixed << std::setprecision(8) << actualData[i] << "f";
-            prefix = ", ";
-        }
+            std::cout << actualData[i] << "f, ";
 
         std::cout << "}" << std::endl;
     }
